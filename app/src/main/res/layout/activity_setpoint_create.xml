@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/input_day"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Day of week number"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/input_hour"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Hour"
+        android:layout_below="@+id/input_day"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/input_minute"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Minute"
+        android:layout_below="@+id/input_hour"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/input_temperature"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Temperature"
+        android:layout_below="@+id/input_minute"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/btn_save_setpoint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/input_temperature"
+        android:text="Save"/>
+
+</RelativeLayout>
