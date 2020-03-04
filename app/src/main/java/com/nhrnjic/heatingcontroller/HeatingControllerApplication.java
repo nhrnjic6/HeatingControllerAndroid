@@ -2,6 +2,10 @@ package com.nhrnjic.heatingcontroller;
 
 import android.app.Application;
 
+import com.nhrnjic.heatingcontroller.service.MqttService;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -15,5 +19,14 @@ public class HeatingControllerApplication extends Application {
                 .schemaVersion(0)
                 .build();
         Realm.setDefaultConfiguration(realmConfig);
+
+        try {
+            MqttService.getInstance(this)
+                    .initConnection();
+        } catch (MqttException e) {
+            System.out.println("Show error connection screen");
+            e.printStackTrace();
+        }
+
     }
 }

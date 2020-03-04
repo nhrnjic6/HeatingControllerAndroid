@@ -7,10 +7,25 @@
     android:padding="10dp"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/tv_temperature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"/>
+
+    <TextView
+        android:id="@+id/tv_status_update_at"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_temperature"
+        android:textSize="10dp"
+        android:layout_marginBottom="15dp"/>
+
     <Button
         android:id="@+id/btn_setpoint_create"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/tv_status_update_at"
         android:text="New Setpoint"/>
 
     <ListView
