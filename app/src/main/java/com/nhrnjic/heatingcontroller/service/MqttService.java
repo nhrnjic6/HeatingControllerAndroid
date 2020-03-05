@@ -15,7 +15,9 @@ import java.util.List;
 
 public class MqttService {
     public static final String MQTT_BROKER_URL = "tcp://test.mosquitto.org:1883";
-    public static final String SYSTEM_STATUS_TOPIC = "sensors/heatingControl/1";
+    public static final String SYSTEM_STATUS_TOPIC = "sensors/heatingControl/1/status";
+    public static final String SYSTEM_CONTROL_TOPIC = "sensors/heatingControl/1";
+
     private static MqttService mqttService;
 
     private final MqttAndroidClient client;
@@ -59,6 +61,12 @@ public class MqttService {
                 System.out.println("Failed connecting to MQTT");
             }
         });
+    }
+
+    public void publishMessage(String jsonMsg) throws MqttException {
+        MqttMessage mqttMessage = new MqttMessage();
+        mqttMessage.setPayload(jsonMsg.getBytes());
+        client.publish(SYSTEM_CONTROL_TOPIC, mqttMessage);
     }
 
     public void disconnect() throws MqttException {

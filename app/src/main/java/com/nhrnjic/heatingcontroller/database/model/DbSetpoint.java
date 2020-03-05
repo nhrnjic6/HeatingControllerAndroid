@@ -1,23 +1,21 @@
 package com.nhrnjic.heatingcontroller.database.model;
 
-import androidx.annotation.NonNull;
-
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-public class DbSetpoint extends RealmObject {
+public class DbSetpoint extends RealmObject implements Comparable<DbSetpoint> {
     @PrimaryKey
     private long id;
-    private String day;
-    private String hour;
-    private String minute;
-    private String temperature;
+    private int day;
+    private int hour;
+    private int minute;
+    private double temperature;
 
     public DbSetpoint() {
 
     }
 
-    public DbSetpoint(String day, String hour, String minute, String temperature) {
+    public DbSetpoint(int day, int hour, int minute, double temperature) {
         this.day = day;
         this.hour = hour;
         this.minute = minute;
@@ -28,41 +26,41 @@ public class DbSetpoint extends RealmObject {
         return id;
     }
 
-    public String getDay() {
+    public int getDay() {
         return day;
     }
 
-    public void setDay(String day) {
+    public void setDay(int day) {
         this.day = day;
     }
 
-    public String getHour() {
+    public int getHour() {
         return hour;
     }
 
-    public void setHour(String hour) {
+    public void setHour(int hour) {
         this.hour = hour;
     }
 
-    public String getMinute() {
+    public int getMinute() {
         return minute;
     }
 
-    public void setMinute(String minute) {
+    public void setMinute(int minute) {
         this.minute = minute;
     }
 
-    public String getTemperature() {
+    public double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(String temperature) {
+    public void setTemperature(double temperature) {
         this.temperature = temperature;
     }
 
     @Override
     public String toString() {
-        return dayToString(Integer.valueOf(day)) + " " + hour + ":" + minute + " " + temperature +"\u2103";
+        return dayToString(day) + " " + hour + ":" + minute + " " + temperature +"\u2103";
     }
 
     private String dayToString(int day){
@@ -77,6 +75,29 @@ public class DbSetpoint extends RealmObject {
             case 8: return "Work Day";
             case 9: return "Weekend";
             default: return "Unknown";
+        }
+    }
+
+    @Override
+    public int compareTo(DbSetpoint o) {
+        if(o.day < day){
+            return 1;
+        }else if(o.day == day){
+            if(o.hour < hour){
+                return 1;
+            }else if(o.hour == hour){
+                if(o.minute < minute){
+                    return 1;
+                }else if(o.minute == minute){
+                    return 0;
+                }else{
+                    return -1;
+                }
+            }else{
+                return -1;
+            }
+        }else{
+            return -1;
         }
     }
 }

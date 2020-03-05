@@ -10,9 +10,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.nhrnjic.heatingcontroller.database.SetpointDatabaseService;
+import com.nhrnjic.heatingcontroller.service.HeatingControlService;
 
 public class SetpointCreateActivity extends AppCompatActivity {
     private SetpointDatabaseService setpointDatabaseService = new SetpointDatabaseService();
+    private HeatingControlService heatingControlService = new HeatingControlService(setpointDatabaseService);
 
     private Button mSaveButton;
     private EditText mDayInput;
@@ -37,11 +39,14 @@ public class SetpointCreateActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setpointDatabaseService.saveSetpoint(
-                        mDayInput.getText().toString(),
-                        mHourInput.getText().toString(),
-                        mMinuteInput.getText().toString(),
-                        mTemperatureInput.getText().toString()
+                        Integer.parseInt(mDayInput.getText().toString()),
+                        Integer.parseInt(mHourInput.getText().toString()),
+                        Integer.parseInt(mMinuteInput.getText().toString()),
+                        Double.parseDouble(mTemperatureInput.getText().toString())
                 );
+
+                System.out.println("Sending new rule set to mqtt");
+                heatingControlService.sendCurrentRules();
 
                 Intent intent = new Intent(v.getContext(), MainActivity.class);
                 startActivity(intent);
