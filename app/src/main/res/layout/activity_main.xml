@@ -4,35 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
+    android:padding="15dp"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/tv_temperature"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_system_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="System Status"
+                android:textSize="20dp"/>
+
+            <TextView
+                android:id="@+id/tv_status_update_at"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Updated at: 20:20:20"
+                android:textSize="10dp"/>
+
+            <TextView
+                android:id="@+id/temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@mipmap/ic_temperature"
+                android:layout_marginTop="10dp"
+                android:paddingLeft="-15dp"
+                android:text="50&#8451;"
+                android:textSize="30dp"/>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30dp"/>
+        android:layout_below="@id/card_system_status"
+        android:layout_marginTop="10dp">
 
-    <TextView
-        android:id="@+id/tv_status_update_at"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_temperature"
-        android:textSize="10dp"
-        android:layout_marginBottom="15dp"/>
+        android:orientation="vertical"
+        android:padding="15dp">
 
-    <Button
-        android:id="@+id/btn_setpoint_create"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_status_update_at"
-        android:text="New Setpoint"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Upcoming setpoint"
+            android:textSize="16dp"/>
 
-    <ListView
-        android:id="@+id/setpoint_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_below="@id/btn_setpoint_create"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Monday 10:00 with max temperature at 50&#8451;"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </RelativeLayout>
