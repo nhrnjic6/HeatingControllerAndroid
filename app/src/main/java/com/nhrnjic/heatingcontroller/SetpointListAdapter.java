@@ -32,7 +32,7 @@ public class SetpointListAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return setpoints.get(position).getId();
     }
 
     @Override
@@ -47,5 +47,9 @@ public class SetpointListAdapter extends BaseAdapter {
         ((TextView) convertView.findViewById(R.id.setpoint_item_day))
                 .setText(setpoint.toString());
         return convertView;
+    }
+
+    public void removeSetpoint(int position){
+        setpoints.remove(position);
     }
 }

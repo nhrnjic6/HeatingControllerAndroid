@@ -37,4 +37,14 @@ public class SetpointDatabaseService {
         Collections.sort(setpoints);
         return setpoints;
     }
+
+    public void removeSetpoint(long id){
+        Realm realm = Realm.getDefaultInstance();
+        DbSetpoint setpoint = realm.where(DbSetpoint.class).equalTo("id", id).findFirst();
+        if(setpoint != null){
+            realm.beginTransaction();
+            setpoint.deleteFromRealm();
+            realm.commitTransaction();
+        }
+    }
 }

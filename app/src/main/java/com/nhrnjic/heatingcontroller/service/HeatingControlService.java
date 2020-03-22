@@ -24,7 +24,8 @@ public class HeatingControlService {
         List<DbSetpoint> setpoints = setpointDatabaseService.getAllSetpoints();
         Rules rules = new Rules();
         rules.setNewRulesUUID(newRulesUUID);
-        rules.setSetpoints(setpoints);
+        rules.setRules(setpoints);
+        rules.setRulesSize(setpoints.size());
 
         Gson gson = new Gson();
         String jsonRules = gson.toJson(rules, Rules.class);

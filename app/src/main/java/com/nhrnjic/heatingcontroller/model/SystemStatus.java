@@ -1,11 +1,16 @@
 package com.nhrnjic.heatingcontroller.model;
 
+import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
+
 import org.joda.time.DateTime;
+
+import java.util.List;
 
 public class SystemStatus {
     private String id;
     private String temperature;
     private long updatedAt;
+    private List<DbSetpoint> rules;
 
     public SystemStatus() {
     }
@@ -34,8 +39,16 @@ public class SystemStatus {
         this.updatedAt = updatedAt;
     }
 
+    public List<DbSetpoint> getRules() {
+        return rules;
+    }
+
+    public void setRules(List<DbSetpoint> rules) {
+        this.rules = rules;
+    }
+
     public String formattedUpdatedAt(){
-        DateTime dateTime = new DateTime(updatedAt);
+        DateTime dateTime = new DateTime(updatedAt * 1000);
         return dateTime.toString("dd:mm:ss");
     }
 }

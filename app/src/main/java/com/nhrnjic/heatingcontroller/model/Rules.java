@@ -7,7 +7,8 @@ import java.util.UUID;
 
 public class Rules {
     private UUID newRulesUUID;
-    private List<DbSetpoint> setpoints;
+    private int rulesSize;
+    private List<DbSetpoint> rules;
 
     public Rules() {
     }
@@ -20,11 +21,19 @@ public class Rules {
         this.newRulesUUID = newRulesUUID;
     }
 
-    public List<DbSetpoint> getSetpoints() {
-        return setpoints;
+    public List<DbSetpoint> getRules() {
+        return rules;
     }
 
-    public void setSetpoints(List<DbSetpoint> setpoints) {
-        this.setpoints = setpoints;
+    public void setRules(List<DbSetpoint> rules) {
+        this.rules = rules;
+    }
+
+    public int getRulesSize() {
+        return rulesSize;
+    }
+
+    public void setRulesSize(int rulesSize) {
+        this.rulesSize = rulesSize;
     }
 }

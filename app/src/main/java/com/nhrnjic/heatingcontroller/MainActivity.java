@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import com.nhrnjic.heatingcontroller.database.TemperatureDatabaseService;
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
 import com.nhrnjic.heatingcontroller.database.model.DbTemperature;
 import com.nhrnjic.heatingcontroller.model.SystemStatus;
+import com.nhrnjic.heatingcontroller.service.HeatingControlService;
 import com.nhrnjic.heatingcontroller.service.MqttService;
 
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -25,6 +27,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private SetpointDatabaseService setpointDatabaseService = new SetpointDatabaseService();
     private TemperatureDatabaseService temperatureDatabaseService = new TemperatureDatabaseService();
+    private HeatingControlService heatingControlService = new HeatingControlService(setpointDatabaseService);
 
     private MqttService mqttService;
     private Gson gson = new Gson();
@@ -56,7 +59,19 @@ public class MainActivity extends AppCompatActivity {
         List<DbSetpoint> setpoints = setpointDatabaseService.getAllSetpoints();
         setLatestTemperature();
 
-        setpointListView.setAdapter(new SetpointListAdapter(setpoints, this));
+        final SetpointListAdapter adapter = new SetpointListAdapter(setpoints, this);
+
+        setpointListView.setAdapter(adapter);
+
+        setpointListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                setpointDatabaseService.removeSetpoint(id);
+                heatingControlService.sendCurrentRules();
+                adapter.removeSetpoint(position);
+                adapter.notifyDataSetChanged();
+            }
+        });
 
         mqttService.addListener(new IMqttMessageListener() {
             @Override
@@ -66,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
                 if(mTempText != null && mStatusUpdateAt != null){
                     String msg = new String(message.getPayload());
                     SystemStatus systemStatus = gson.fromJson(msg, SystemStatus.class);
+
+                    if(systemStatus.getRules() != null){
+                        System.out.println("Received rules size = " + systemStatus.getRules().size());
+                    }
 
                     temperatureDatabaseService.saveTemperature(
                             Double.parseDouble(systemStatus.getTemperature()),
