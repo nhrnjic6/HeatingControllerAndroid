@@ -1,9 +1,11 @@
 package com.nhrnjic.heatingcontroller;
 
+import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,6 +37,13 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mTempText;
     private TextView mStatusUpdateAt;
+    private Button defaultModeButton;
+    private Button onModeButton;
+    private Button offModeButton;
+
+    private Drawable defaultButtonDrawable;
+    private Drawable onButtonDrawable;
+    private Drawable offButtonDrawable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +53,12 @@ public class MainActivity extends AppCompatActivity {
         mqttService = MqttService.getInstance(this);
         mStatusUpdateAt = findViewById(R.id.tv_status_update_at);
         mTempText = findViewById(R.id.temperature);
+        defaultModeButton = findViewById(R.id.btn_default_mode);
+        defaultButtonDrawable = defaultModeButton.getBackground();
+        onModeButton = findViewById(R.id.btn_on_mode);
+        onButtonDrawable = onModeButton.getBackground();
+        offModeButton = findViewById(R.id.btn_off_mode);
+        offButtonDrawable = offModeButton.getBackground();
 
         final Gson gson = new Gson();
 
@@ -60,6 +75,51 @@ public class MainActivity extends AppCompatActivity {
                         mStatusUpdateAt.setText("Updated at:" + systemStatus.formattedUpdatedAt());
                     }
                 });
+            }
+        });
+
+        defaultModeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                heatingControlService.sendCurrentRules(2);
+                defaultModeButton.setBackgroundColor(Color.parseColor("#4CAF50"));
+                defaultModeButton.setTextColor(Color.parseColor("#EFECEC"));
+
+                onModeButton.setBackground(onButtonDrawable);
+                onModeButton.setTextColor(Color.parseColor("#E3171616"));
+
+                offModeButton.setBackground(offButtonDrawable);
+                offModeButton.setTextColor(Color.parseColor("#E3171616"));
+            }
+        });
+
+        onModeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                heatingControlService.sendCurrentRules(1);
+                onModeButton.setBackgroundColor(Color.parseColor("#4CAF50"));
+                onModeButton.setTextColor(Color.parseColor("#EFECEC"));
+
+                defaultModeButton.setBackground(defaultButtonDrawable);
+                defaultModeButton.setTextColor(Color.parseColor("#E3171616"));
+
+                offModeButton.setBackground(offButtonDrawable);
+                offModeButton.setTextColor(Color.parseColor("#E3171616"));
+            }
+        });
+
+        offModeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                heatingControlService.sendCurrentRules(0);
+                offModeButton.setBackgroundColor(Color.parseColor("#4CAF50"));
+                offModeButton.setTextColor(Color.parseColor("#EFECEC"));
+
+                onModeButton.setBackground(onButtonDrawable);
+                onModeButton.setTextColor(Color.parseColor("#E3171616"));
+
+                defaultModeButton.setBackground(defaultButtonDrawable);
+                defaultModeButton.setTextColor(Color.parseColor("#E3171616"));
             }
         });
 

@@ -8,7 +8,6 @@ import com.nhrnjic.heatingcontroller.model.Rules;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.List;
-import java.util.UUID;
 
 public class HeatingControlService {
     private SetpointDatabaseService setpointDatabaseService;
@@ -19,13 +18,12 @@ public class HeatingControlService {
         mqttService = MqttService.getInstance(null);
     }
 
-    public UUID sendCurrentRules(){
-        UUID newRulesUUID = UUID.randomUUID();
+    public void sendCurrentRules(int rulesMode){
         List<DbSetpoint> setpoints = setpointDatabaseService.getAllSetpoints();
         Rules rules = new Rules();
-        rules.setNewRulesUUID(newRulesUUID);
         rules.setRules(setpoints);
         rules.setRulesSize(setpoints.size());
+        rules.setRulesMode(rulesMode);
 
         Gson gson = new Gson();
         String jsonRules = gson.toJson(rules, Rules.class);
@@ -36,7 +34,5 @@ public class HeatingControlService {
         } catch (MqttException e) {
             System.out.println("Failed sending message to heatingControl/1");
         }
-
-        return newRulesUUID;
     }
 }

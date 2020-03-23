@@ -133,23 +133,27 @@
                 android:layout_marginTop="10dp">
 
                 <Button
+                    android:id="@+id/btn_default_mode"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="#4CAF50"
-                    android:textColor="#EFECEC"
+                    android:textColor="#E3171616"
                     android:text="DEFAULT"/>
 
                 <Button
+                    android:id="@+id/btn_on_mode"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:textColor="#E3171616"
                     android:text="ON"/>
 
                 <Button
+                    android:id="@+id/btn_off_mode"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:textColor="#E3171616"
                     android:text="OFF"/>
 
             </LinearLayout>
