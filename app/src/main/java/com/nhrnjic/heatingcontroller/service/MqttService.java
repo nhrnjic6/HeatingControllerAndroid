@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MqttService {
-    public static final String MQTT_BROKER_URL = "tcp://192.168.1.5:1883";
+    public static final String MQTT_BROKER_URL = "tcp://192.168.1.3:1883";
     public static final String SYSTEM_STATUS_TOPIC = "sensors/heatingControl/1/status";
     public static final String SYSTEM_CONTROL_TOPIC = "sensors/heatingControl/1";
 

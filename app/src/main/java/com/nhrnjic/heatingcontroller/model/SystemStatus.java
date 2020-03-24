@@ -3,13 +3,16 @@ package com.nhrnjic.heatingcontroller.model;
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class SystemStatus {
     private String id;
-    private String temperature;
+    private BigDecimal temperature;
     private long updatedAt;
+    private int rulesMode;
     private List<DbSetpoint> rules;
 
     public SystemStatus() {
@@ -23,11 +26,16 @@ public class SystemStatus {
         this.id = id;
     }
 
-    public String getTemperature() {
+    public BigDecimal getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(String temperature) {
+    public String getTemperatureRounded() {
+        temperature = temperature.setScale(2 ,BigDecimal.ROUND_HALF_UP);
+        return temperature.toString();
+    }
+
+    public void setTemperature(BigDecimal temperature) {
         this.temperature = temperature;
     }
 
@@ -47,8 +55,16 @@ public class SystemStatus {
         this.rules = rules;
     }
 
+    public int getRulesMode() {
+        return rulesMode;
+    }
+
+    public void setRulesMode(int rulesMode) {
+        this.rulesMode = rulesMode;
+    }
+
     public String formattedUpdatedAt(){
-        DateTime dateTime = new DateTime(updatedAt * 1000);
-        return dateTime.toString("dd:mm:ss");
+        return new DateTime(updatedAt * 1000, DateTimeZone.UTC)
+                .toString("HH:mm:ss");
     }
 }

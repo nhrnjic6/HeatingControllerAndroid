@@ -3,22 +3,13 @@ package com.nhrnjic.heatingcontroller.model;
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
 
 import java.util.List;
-import java.util.UUID;
 
 public class Rules {
-    private UUID newRulesUUID;
     private int rulesSize;
+    private int rulesMode;
     private List<DbSetpoint> rules;
 
     public Rules() {
-    }
-
-    public UUID getNewRulesUUID() {
-        return newRulesUUID;
-    }
-
-    public void setNewRulesUUID(UUID newRulesUUID) {
-        this.newRulesUUID = newRulesUUID;
     }
 
     public List<DbSetpoint> getRules() {
@@ -35,5 +26,13 @@ public class Rules {
 
     public void setRulesSize(int rulesSize) {
         this.rulesSize = rulesSize;
+    }
+
+    public int getRulesMode() {
+        return rulesMode;
+    }
+
+    public void setRulesMode(int rulesMode) {
+        this.rulesMode = rulesMode;
     }
 }
