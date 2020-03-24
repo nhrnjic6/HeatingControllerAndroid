@@ -1,4 +1,4 @@
-package com.nhrnjic.heatingcontroller;
+package com.nhrnjic.heatingcontroller.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.nhrnjic.heatingcontroller.R;
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
 
 import java.util.List;
@@ -14,6 +15,9 @@ import java.util.List;
 public class SetpointListAdapter extends BaseAdapter {
     private List<DbSetpoint> setpoints;
     private Context context;
+    private int position;
+    private View convertView;
+    private ViewGroup parent;
 
     public SetpointListAdapter(List<DbSetpoint> setpoints, Context context) {
         this.setpoints = setpoints;
@@ -37,15 +41,15 @@ public class SetpointListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        this.position = position;
+        this.convertView = convertView;
+        this.parent = parent;
         if (convertView == null) {
             convertView = LayoutInflater.from(context)
-                    .inflate(R.layout.setpoint_item, parent, false);
+                    .inflate(R.layout.setpoint_list_item, parent, false);
         }
 
         DbSetpoint setpoint = (DbSetpoint) getItem(position);
-
-        ((TextView) convertView.findViewById(R.id.setpoint_item_day))
-                .setText(setpoint.toString());
         return convertView;
     }
 

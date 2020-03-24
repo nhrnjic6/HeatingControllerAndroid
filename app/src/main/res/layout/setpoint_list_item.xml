@@ -1,0 +1,29 @@
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:background="#fff"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/setpoint_item_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10:00"
+        android:drawableLeft="@mipmap/ic_time"
+        android:gravity="center_vertical"
+        android:drawablePadding="5dp"
+        android:textSize="25dp"/>
+
+    <TextView
+        android:id="@+id/setpoint_item_temperature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@mipmap/ic_temperature"
+        android:text="50&#8451;"
+        android:textSize="25dp"
+        android:drawablePadding="5dp"
+        android:gravity="center_vertical"
+        android:layout_alignParentRight="true"/>
+
+</RelativeLayout>
+
