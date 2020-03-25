@@ -7,8 +7,10 @@ import org.joda.time.DateTimeZone;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public class SystemStatus {
+    private UUID requestId;
     private String id;
     private BigDecimal temperature;
     private long updatedAt;
@@ -66,5 +68,13 @@ public class SystemStatus {
     public String formattedUpdatedAt(){
         return new DateTime(updatedAt * 1000, DateTimeZone.UTC)
                 .toString("HH:mm:ss");
+    }
+
+    public UUID getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(UUID requestId) {
+        this.requestId = requestId;
     }
 }

@@ -19,14 +19,5 @@ public class HeatingControllerApplication extends Application {
                 .schemaVersion(0)
                 .build();
         Realm.setDefaultConfiguration(realmConfig);
-
-        try {
-            MqttService.getInstance(this)
-                    .initConnection();
-        } catch (MqttException e) {
-            System.out.println("Show error connection screen");
-            e.printStackTrace();
-        }
-
     }
 }
