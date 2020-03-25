@@ -1,5 +1,10 @@
 package com.nhrnjic.heatingcontroller.database.model;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
+import java.sql.Time;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -61,6 +66,23 @@ public class DbSetpoint extends RealmObject implements Comparable<DbSetpoint> {
     @Override
     public String toString() {
         return dayToString(day) + " " + hour + ":" + minute + " " + temperature +"\u2103";
+    }
+
+    public String getTimeText(){
+        DateTime now = DateTime.now();
+        DateTime setpointTime = new DateTime(
+                now.getYear(),
+                now.getMonthOfYear(),
+                now.getDayOfMonth(),
+                hour, minute,
+                DateTimeZone.UTC
+        );
+
+        return setpointTime.toString("HH:mm");
+    }
+
+    public String getTemperatureText(){
+        return temperature + "\u2103";
     }
 
     private String dayToString(int day){

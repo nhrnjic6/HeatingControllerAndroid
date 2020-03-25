@@ -12,24 +12,28 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.nhrnjic.heatingcontroller.adapter.SetpointListAdapter;
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
+import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
+
+import org.joda.time.DateTime;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class SetpointListActivity extends AppCompatActivity {
+    private SetpointRepository setpointRepository;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setpoint_list);
 
+        setpointRepository = SetpointRepository.getInstance();
+
         ListView listView = findViewById(R.id.setpoint_list);
 
-        List<DbSetpoint> setpoints = Arrays.asList(
-                new DbSetpoint(1, 10, 0, 45),
-                new DbSetpoint(1, 12, 30, 55),
-                new DbSetpoint(1, 14, 0, 15),
-                new DbSetpoint(1, 17, 40, 25),
-                new DbSetpoint(1, 20, 40, 20));
+        List<DbSetpoint> setpoints = setpointRepository.getSetpoints(
+                DateTime.now().getDayOfWeek()
+        );
 
         SetpointListAdapter adapter = new SetpointListAdapter(setpoints, this);
         listView.setAdapter(adapter);
@@ -41,13 +45,9 @@ public class SetpointListActivity extends AppCompatActivity {
         builder.setItems(daysOfWeek, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0: // horse
-                    case 1: // cow
-                    case 2: // camel
-                    case 3: // sheep
-                    case 4: // goat
-                }
+                List<DbSetpoint> setpoints = setpointRepository.getSetpoints(which + 1);
+                adapter.setSetpoints(setpoints);
+                adapter.notifyDataSetChanged();
             }
         });
 

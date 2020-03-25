@@ -50,10 +50,20 @@ public class SetpointListAdapter extends BaseAdapter {
         }
 
         DbSetpoint setpoint = (DbSetpoint) getItem(position);
+
+        TextView timeText = convertView.findViewById(R.id.setpoint_item_time);
+        timeText.setText(setpoint.getTimeText());
+
+        TextView temperatureText = convertView.findViewById(R.id.setpoint_item_temperature);
+        temperatureText.setText(setpoint.getTemperatureText());
         return convertView;
     }
 
     public void removeSetpoint(int position){
         setpoints.remove(position);
+    }
+
+    public void setSetpoints(List<DbSetpoint> setpoints) {
+        this.setpoints = setpoints;
     }
 }
