@@ -27,9 +27,10 @@ public class SetpointListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setpoint_list);
 
-        setpointRepository = SetpointRepository.getInstance();
-
+        Button dayPickerButton = findViewById(R.id.setpoint_day_picker_btn);
         ListView listView = findViewById(R.id.setpoint_list);
+
+        setpointRepository = SetpointRepository.getInstance();
 
         List<DbSetpoint> setpoints = setpointRepository.getSetpoints(
                 DateTime.now().getDayOfWeek()
@@ -45,6 +46,7 @@ public class SetpointListActivity extends AppCompatActivity {
         builder.setItems(daysOfWeek, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                dayPickerButton.setText(daysOfWeek[which]);
                 List<DbSetpoint> setpoints = setpointRepository.getSetpoints(which + 1);
                 adapter.setSetpoints(setpoints);
                 adapter.notifyDataSetChanged();
@@ -53,7 +55,7 @@ public class SetpointListActivity extends AppCompatActivity {
 
         final AlertDialog dialog = builder.create();
 
-        Button dayPickerButton = findViewById(R.id.setpoint_day_picker_btn);
+        dayPickerButton.setText(daysOfWeek[DateTime.now().getDayOfWeek() - 1]);
         dayPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
