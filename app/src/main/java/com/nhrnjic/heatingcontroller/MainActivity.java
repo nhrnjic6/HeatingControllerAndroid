@@ -60,8 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             mqttService.getSystemStatus(systemStatus -> {
-                mTempText.setText(systemStatus.getTemperatureRounded() + "\u2103");
-                mStatusUpdateAt.setText("Updated at:" + systemStatus.formattedUpdatedAt());
+                runOnUiThread(() -> {
+                    mTempText.setText(systemStatus.getTemperatureRounded() + "\u2103");
+                    mStatusUpdateAt.setText("Updated at:" + systemStatus.formattedUpdatedAt());
+                });
             });
         } catch (MqttException e) {
             e.printStackTrace();
