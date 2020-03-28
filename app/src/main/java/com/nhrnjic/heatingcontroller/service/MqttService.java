@@ -21,8 +21,7 @@ import java.util.UUID;
 
 public class MqttService {
     public static final String MQTT_BROKER_URL = "tcp://192.168.1.3:1883";
-    public static final String SYSTEM_STATUS_TOPIC = "sensors/heatingControl/1/status";
-    public static final String SYSTEM_CONTROL_TOPIC = "sensors/heatingControl/1";
+    public static final String STATUS_TOPIC = "sensors/heatingControl/status";
     public static final String ACTION_TOPIC = "sensors/heatingControl/action";
 
     private static MqttService mqttService;
@@ -53,24 +52,37 @@ public class MqttService {
             UUID pairRequestUUID = UUID.randomUUID();
             Gson gson = new Gson();
 
-            client.subscribe(SYSTEM_STATUS_TOPIC, 1, (topic, message) -> {
+            client.subscribe(STATUS_TOPIC, 1, (topic, message) -> {
                 SystemStatus systemStatus = gson.fromJson(new String(message.getPayload()), SystemStatus.class);
                 if(pairRequestUUID.equals(systemStatus.getRequestId())){
                     listener.systemStatusReceived(systemStatus);
+                    client.unsubscribe(STATUS_TOPIC);
                 }
             });
 
-            DeviceAction action = new DeviceAction(pairRequestUUID, "get_status");
+            DeviceAction action = new DeviceAction(pairRequestUUID, "get_setpoints");
             String jsonAction = gson.toJson(action, DeviceAction.class);
             MqttMessage mqttMessage = new MqttMessage(jsonAction.getBytes());
             client.publish(ACTION_TOPIC, mqttMessage);
         }
     }
 
-    public void publishMessage(String jsonMsg) throws MqttException {
+    public void sendAction(DeviceAction action, SystemStatusListener listener) throws MqttException {
+        Gson gson = new Gson();
+        UUID pairRequestUUID = UUID.randomUUID();
+
+        String jsonMsg = gson.toJson(action, DeviceAction.class);
         MqttMessage mqttMessage = new MqttMessage();
         mqttMessage.setPayload(jsonMsg.getBytes());
-        client.publish(SYSTEM_CONTROL_TOPIC, mqttMessage);
+        client.publish(ACTION_TOPIC, mqttMessage);
+
+        client.subscribe(STATUS_TOPIC, 1, (topic, message) -> {
+            SystemStatus systemStatus = gson.fromJson(new String(message.getPayload()), SystemStatus.class);
+            if(pairRequestUUID.equals(systemStatus.getRequestId())){
+                listener.systemStatusReceived(systemStatus);
+                client.unsubscribe(STATUS_TOPIC);
+            }
+        });
     }
 
     public void disconnect() throws MqttException {

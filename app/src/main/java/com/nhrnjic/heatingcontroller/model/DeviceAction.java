@@ -1,29 +1,54 @@
 package com.nhrnjic.heatingcontroller.model;
 
+import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
+
+import java.util.List;
 import java.util.UUID;
 
 public class DeviceAction {
-    private UUID actionId;
-    private String action;
+    private UUID requestId;
+    private String actionType;
+    private int rulesMode;
+    private List<DbSetpoint> rules;
 
-    public DeviceAction(UUID actionId, String action) {
-        this.actionId = actionId;
-        this.action = action;
+    public DeviceAction(){
+
     }
 
-    public UUID getActionId() {
-        return actionId;
+    public DeviceAction(UUID requestId, String action) {
+        this.requestId = requestId;
+        this.actionType = action;
     }
 
-    public void setActionId(UUID actionId) {
-        this.actionId = actionId;
+    public UUID getRequestId() {
+        return requestId;
     }
 
-    public String getAction() {
-        return action;
+    public void setRequestId(UUID requestId) {
+        this.requestId = requestId;
     }
 
-    public void setAction(String action) {
-        this.action = action;
+    public String getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
+    }
+
+    public int getRulesMode() {
+        return rulesMode;
+    }
+
+    public void setRulesMode(int rulesMode) {
+        this.rulesMode = rulesMode;
+    }
+
+    public List<DbSetpoint> getRules() {
+        return rules;
+    }
+
+    public void setRules(List<DbSetpoint> rules) {
+        this.rules = rules;
     }
 }
