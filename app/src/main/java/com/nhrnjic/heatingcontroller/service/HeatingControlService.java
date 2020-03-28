@@ -29,10 +29,10 @@ public class HeatingControlService {
         String jsonRules = gson.toJson(rules, Rules.class);
 
         System.out.println("Rules: " + jsonRules);
-        try {
-            mqttService.publishMessage(jsonRules);
-        } catch (MqttException e) {
-            System.out.println("Failed sending message to heatingControl/1");
-        }
+//        try {
+//            mqttService.publishMessage(nu);
+//        } catch (MqttException e) {
+//            System.out.println("Failed sending message to heatingControl/1");
+//        }
     }
 }
