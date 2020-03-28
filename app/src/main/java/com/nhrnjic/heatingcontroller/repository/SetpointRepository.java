@@ -11,6 +11,7 @@ public final class SetpointRepository {
     private BigDecimal temperature;
     private int heaterMode;
     private String currentRuleId;
+    private long updatedAt;
     private List<DbSetpoint> setpoints;
 
     private static SetpointRepository setpointRepository = new SetpointRepository();
@@ -69,5 +70,13 @@ public final class SetpointRepository {
 
     public void setCurrentRuleId(String currentRuleId) {
         this.currentRuleId = currentRuleId;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

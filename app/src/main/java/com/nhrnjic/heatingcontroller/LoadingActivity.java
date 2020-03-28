@@ -34,8 +34,9 @@ public class LoadingActivity extends AppCompatActivity {
                             repository.setHeaterMode(status.getRulesMode());
                             repository.setTemperature(status.getTemperature());
                             repository.setSetpoints(status.getRules());
+                            repository.setUpdatedAt(status.getUpdatedAt());
 
-                            Intent intent = new Intent(LoadingActivity.this, SetpointListActivity.class);
+                            Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
                             startActivity(intent);
                         });
                     } catch (MqttException e) {

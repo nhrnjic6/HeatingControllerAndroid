@@ -28,11 +28,11 @@ public class HeatingControlService {
         Gson gson = new Gson();
         String jsonRules = gson.toJson(rules, Rules.class);
 
-        System.out.println("Rules: " + jsonRules);
-//        try {
-//            mqttService.publishMessage(nu);
-//        } catch (MqttException e) {
-//            System.out.println("Failed sending message to heatingControl/1");
-//        }
+//        System.out.println("Rules: " + jsonRules);
+////        try {
+////            mqttService.publishMessage(nu);
+////        } catch (MqttException e) {
+////            System.out.println("Failed sending message to heatingControl/1");
+////        }
     }
 }

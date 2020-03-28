@@ -47,6 +47,14 @@ public class MqttService {
         client.connect().setActionCallback(actionListener);
     }
 
+    public void getSystemStatus(SystemStatusListener listener) throws MqttException {
+        Gson gson = new Gson();
+        client.subscribe(STATUS_TOPIC, 1, (topic, message) -> {
+            SystemStatus systemStatus = gson.fromJson(new String(message.getPayload()), SystemStatus.class);
+                listener.systemStatusReceived(systemStatus);
+        });
+    }
+
     public void pairWithDevice(SystemStatusListener listener) throws MqttException{
         if(client.isConnected()){
             UUID pairRequestUUID = UUID.randomUUID();
