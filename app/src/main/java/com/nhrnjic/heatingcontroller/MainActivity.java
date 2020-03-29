@@ -1,10 +1,15 @@
 package com.nhrnjic.heatingcontroller;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -16,7 +21,6 @@ import com.nhrnjic.heatingcontroller.service.MqttService;
 import org.eazegraph.lib.charts.ValueLineChart;
 import org.eazegraph.lib.models.ValueLinePoint;
 import org.eazegraph.lib.models.ValueLineSeries;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -44,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         mqttService = MqttService.getInstance(this);
         mStatusUpdateAt = findViewById(R.id.tv_status_update_at);
         mTempText = findViewById(R.id.temperature);
@@ -54,20 +61,20 @@ public class MainActivity extends AppCompatActivity {
         offModeButton = findViewById(R.id.btn_off_mode);
         offButtonDrawable = offModeButton.getBackground();
 
-        mTempText.setText(roundTemperature(setpointRepository.getTemperature()) + "\u2103");
-        mStatusUpdateAt.setText("Updated at:" + formatTime(setpointRepository.getUpdatedAt()));
-
-
-        try {
-            mqttService.getSystemStatus(systemStatus -> {
-                runOnUiThread(() -> {
-                    mTempText.setText(systemStatus.getTemperatureRounded() + "\u2103");
-                    mStatusUpdateAt.setText("Updated at:" + systemStatus.formattedUpdatedAt());
-                });
-            });
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+//        mTempText.setText(roundTemperature(setpointRepository.getTemperature()) + "\u2103");
+//        mStatusUpdateAt.setText("Updated at:" + formatTime(setpointRepository.getUpdatedAt()));
+//
+//
+//        try {
+//            mqttService.getSystemStatus(systemStatus -> {
+//                runOnUiThread(() -> {
+//                    mTempText.setText(systemStatus.getTemperatureRounded() + "\u2103");
+//                    mStatusUpdateAt.setText("Updated at:" + systemStatus.formattedUpdatedAt());
+//                });
+//            });
+//        } catch (MqttException e) {
+//            e.printStackTrace();
+//        }
 
         defaultModeButton.setOnClickListener(v -> {
             heatingControlService.sendCurrentRules(2);
@@ -125,6 +132,24 @@ public class MainActivity extends AppCompatActivity {
 
         mCubicValueLineChart.addSeries(series);
         mCubicValueLineChart.startAnimation();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.setpoints:
+                Intent intent = new Intent(MainActivity.this, SetpointListActivity.class);
+                startActivity(intent);
+                return true;
+        }
+
+        return true;
     }
 
     private String roundTemperature(BigDecimal temperature) {
