@@ -6,38 +6,18 @@ import java.util.List;
 import java.util.UUID;
 
 public class DeviceAction {
-    private UUID requestId;
-    private String actionType;
+    private final UUID requestId;
+    private final String actionType;
     private int rulesMode;
     private List<DbSetpoint> rules;
 
-    public DeviceAction(){
-
-    }
-
-    public DeviceAction(UUID requestId, String action) {
-        this.requestId = requestId;
+    public DeviceAction(String action) {
+        this.requestId = UUID.randomUUID();
         this.actionType = action;
     }
 
     public UUID getRequestId() {
         return requestId;
-    }
-
-    public void setRequestId(UUID requestId) {
-        this.requestId = requestId;
-    }
-
-    public String getActionType() {
-        return actionType;
-    }
-
-    public void setActionType(String actionType) {
-        this.actionType = actionType;
-    }
-
-    public int getRulesMode() {
-        return rulesMode;
     }
 
     public void setRulesMode(int rulesMode) {

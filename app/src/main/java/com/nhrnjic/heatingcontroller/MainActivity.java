@@ -1,42 +1,40 @@
 package com.nhrnjic.heatingcontroller;
 
-import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.nhrnjic.heatingcontroller.database.SetpointDatabaseService;
-import com.nhrnjic.heatingcontroller.database.TemperatureDatabaseService;
-import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
-import com.nhrnjic.heatingcontroller.database.model.DbTemperature;
 import com.nhrnjic.heatingcontroller.model.SystemStatus;
+import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
 import com.nhrnjic.heatingcontroller.service.HeatingControlService;
 import com.nhrnjic.heatingcontroller.service.MqttService;
 
 import org.eazegraph.lib.charts.ValueLineChart;
 import org.eazegraph.lib.models.ValueLinePoint;
 import org.eazegraph.lib.models.ValueLineSeries;
-import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
+import java.math.BigDecimal;
 
 public class MainActivity extends AppCompatActivity {
-    private SetpointDatabaseService setpointDatabaseService = new SetpointDatabaseService();
-    private TemperatureDatabaseService temperatureDatabaseService = new TemperatureDatabaseService();
-    private HeatingControlService heatingControlService = new HeatingControlService(setpointDatabaseService);
-
+    private HeatingControlService heatingControlService = new HeatingControlService();
+    private SetpointRepository setpointRepository = SetpointRepository.getInstance();
     private MqttService mqttService;
 
     private TextView mTempText;
     private TextView mStatusUpdateAt;
+
     private Button defaultModeButton;
     private Button onModeButton;
     private Button offModeButton;
@@ -51,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mqttService = MqttService.getInstance(this);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         mStatusUpdateAt = findViewById(R.id.tv_status_update_at);
         mTempText = findViewById(R.id.temperature);
         defaultModeButton = findViewById(R.id.btn_default_mode);
@@ -60,67 +62,37 @@ public class MainActivity extends AppCompatActivity {
         offModeButton = findViewById(R.id.btn_off_mode);
         offButtonDrawable = offModeButton.getBackground();
 
-        final Gson gson = new Gson();
+        setActiveButton(setpointRepository.getHeaterMode());
+        mTempText.setText(roundTemperature(setpointRepository.getTemperature()) + "\u2103");
+        mStatusUpdateAt.setText("Updated at:" + formatTime(setpointRepository.getUpdatedAt()));
 
-        mqttService.addListener(new IMqttMessageListener() {
-            @Override
-            public void messageArrived(String topic, MqttMessage message) {
-                final SystemStatus systemStatus = gson.fromJson(new String(message.getPayload()), SystemStatus.class);
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("Time: " + systemStatus.formattedUpdatedAt());
-                        mTempText.setText(systemStatus.getTemperatureRounded() + "\u2103");
-                        mStatusUpdateAt.setText("Updated at:" + systemStatus.formattedUpdatedAt());
-                    }
-                });
-            }
+        try {
+            mqttService.getSystemStatus(systemStatus ->
+                    runOnUiThread(() -> updateSystemStatus(systemStatus)));
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
+        offModeButton.setOnClickListener(v -> {
+            heatingControlService.updateConfig(
+                    0,
+                    setpointRepository.getSetpoints(),
+                    systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
         });
 
-        defaultModeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                heatingControlService.sendCurrentRules(2);
-                defaultModeButton.setBackgroundColor(Color.parseColor("#4CAF50"));
-                defaultModeButton.setTextColor(Color.parseColor("#EFECEC"));
-
-                onModeButton.setBackground(onButtonDrawable);
-                onModeButton.setTextColor(Color.parseColor("#E3171616"));
-
-                offModeButton.setBackground(offButtonDrawable);
-                offModeButton.setTextColor(Color.parseColor("#E3171616"));
-            }
+        onModeButton.setOnClickListener(v -> {
+            heatingControlService.updateConfig(
+                    1,
+                    setpointRepository.getSetpoints(),
+                    systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
         });
 
-        onModeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                heatingControlService.sendCurrentRules(1);
-                onModeButton.setBackgroundColor(Color.parseColor("#4CAF50"));
-                onModeButton.setTextColor(Color.parseColor("#EFECEC"));
-
-                defaultModeButton.setBackground(defaultButtonDrawable);
-                defaultModeButton.setTextColor(Color.parseColor("#E3171616"));
-
-                offModeButton.setBackground(offButtonDrawable);
-                offModeButton.setTextColor(Color.parseColor("#E3171616"));
-            }
-        });
-
-        offModeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                heatingControlService.sendCurrentRules(0);
-                offModeButton.setBackgroundColor(Color.parseColor("#4CAF50"));
-                offModeButton.setTextColor(Color.parseColor("#EFECEC"));
-
-                onModeButton.setBackground(onButtonDrawable);
-                onModeButton.setTextColor(Color.parseColor("#E3171616"));
-
-                defaultModeButton.setBackground(defaultButtonDrawable);
-                defaultModeButton.setTextColor(Color.parseColor("#E3171616"));
-            }
+        defaultModeButton.setOnClickListener(v -> {
+            heatingControlService.updateConfig(
+                    2,
+                    setpointRepository.getSetpoints(),
+                    systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
         });
 
         ValueLineChart mCubicValueLineChart = findViewById(R.id.cubiclinechart);
@@ -143,5 +115,75 @@ public class MainActivity extends AppCompatActivity {
 
         mCubicValueLineChart.addSeries(series);
         mCubicValueLineChart.startAnimation();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.setpoints:
+                Intent intent = new Intent(MainActivity.this, SetpointListActivity.class);
+                startActivity(intent);
+                return true;
+        }
+
+        return true;
+    }
+
+    private String roundTemperature(BigDecimal temperature) {
+        temperature = temperature.setScale(2 , BigDecimal.ROUND_HALF_UP);
+        return temperature.toString();
+    }
+
+    private String formatTime(long milis){
+        return new DateTime(milis * 1000, DateTimeZone.UTC)
+                .toString("HH:mm:ss");
+    }
+
+    private void setActiveButton(int heaterMode){
+        switch (heaterMode){
+            case 0:
+                offModeButton.setBackgroundColor(Color.parseColor("#4CAF50"));
+                offModeButton.setTextColor(Color.parseColor("#EFECEC"));
+
+                onModeButton.setBackground(onButtonDrawable);
+                onModeButton.setTextColor(Color.parseColor("#E3171616"));
+
+                defaultModeButton.setBackground(defaultButtonDrawable);
+                defaultModeButton.setTextColor(Color.parseColor("#E3171616"));
+                return;
+
+            case 1:
+                onModeButton.setBackgroundColor(Color.parseColor("#4CAF50"));
+                onModeButton.setTextColor(Color.parseColor("#EFECEC"));
+
+                defaultModeButton.setBackground(defaultButtonDrawable);
+                defaultModeButton.setTextColor(Color.parseColor("#E3171616"));
+
+                offModeButton.setBackground(offButtonDrawable);
+                offModeButton.setTextColor(Color.parseColor("#E3171616"));
+                return;
+            case 2:
+                defaultModeButton.setBackgroundColor(Color.parseColor("#4CAF50"));
+                defaultModeButton.setTextColor(Color.parseColor("#EFECEC"));
+
+                onModeButton.setBackground(onButtonDrawable);
+                onModeButton.setTextColor(Color.parseColor("#E3171616"));
+
+                offModeButton.setBackground(offButtonDrawable);
+                offModeButton.setTextColor(Color.parseColor("#E3171616"));
+                return;
+        }
+    }
+
+    private void updateSystemStatus(SystemStatus status){
+        mTempText.setText(status.getTemperatureRounded() + "\u2103");
+        mStatusUpdateAt.setText("Updated at:" + status.formattedUpdatedAt());
+        setActiveButton(status.getRulesMode());
     }
 }

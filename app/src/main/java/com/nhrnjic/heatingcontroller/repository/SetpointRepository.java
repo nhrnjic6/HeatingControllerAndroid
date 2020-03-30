@@ -11,6 +11,7 @@ public final class SetpointRepository {
     private BigDecimal temperature;
     private int heaterMode;
     private String currentRuleId;
+    private long updatedAt;
     private List<DbSetpoint> setpoints;
 
     private static SetpointRepository setpointRepository = new SetpointRepository();
@@ -39,10 +40,14 @@ public final class SetpointRepository {
     }
 
     public List<DbSetpoint> getSetpoints(final int day) {
-        List<DbSetpoint> setpointsOfDay = new ArrayList<>();
-
         return setpoints.stream()
                 .filter(x -> x.getDay() == day)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public List<DbSetpoint> getSetpoints() {
+        return setpoints.stream()
                 .sorted()
                 .collect(Collectors.toList());
     }
@@ -69,5 +74,13 @@ public final class SetpointRepository {
 
     public void setCurrentRuleId(String currentRuleId) {
         this.currentRuleId = currentRuleId;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
