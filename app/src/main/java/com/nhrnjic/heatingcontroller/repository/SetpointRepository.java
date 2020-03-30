@@ -40,10 +40,14 @@ public final class SetpointRepository {
     }
 
     public List<DbSetpoint> getSetpoints(final int day) {
-        List<DbSetpoint> setpointsOfDay = new ArrayList<>();
-
         return setpoints.stream()
                 .filter(x -> x.getDay() == day)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public List<DbSetpoint> getSetpoints() {
+        return setpoints.stream()
                 .sorted()
                 .collect(Collectors.toList());
     }

@@ -13,7 +13,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.nhrnjic.heatingcontroller.database.SetpointDatabaseService;
+import com.nhrnjic.heatingcontroller.model.SystemStatus;
 import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
 import com.nhrnjic.heatingcontroller.service.HeatingControlService;
 import com.nhrnjic.heatingcontroller.service.MqttService;
@@ -28,14 +28,13 @@ import org.joda.time.DateTimeZone;
 import java.math.BigDecimal;
 
 public class MainActivity extends AppCompatActivity {
-    private SetpointDatabaseService setpointDatabaseService = new SetpointDatabaseService();
-    private HeatingControlService heatingControlService = new HeatingControlService(setpointDatabaseService);
+    private HeatingControlService heatingControlService = new HeatingControlService();
     private SetpointRepository setpointRepository = SetpointRepository.getInstance();
-
     private MqttService mqttService;
 
     private TextView mTempText;
     private TextView mStatusUpdateAt;
+
     private Button defaultModeButton;
     private Button onModeButton;
     private Button offModeButton;
@@ -49,10 +48,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mqttService = MqttService.getInstance(this);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mqttService = MqttService.getInstance(this);
         mStatusUpdateAt = findViewById(R.id.tv_status_update_at);
         mTempText = findViewById(R.id.temperature);
         defaultModeButton = findViewById(R.id.btn_default_mode);
@@ -63,35 +63,36 @@ public class MainActivity extends AppCompatActivity {
         offButtonDrawable = offModeButton.getBackground();
 
         setActiveButton(setpointRepository.getHeaterMode());
-
         mTempText.setText(roundTemperature(setpointRepository.getTemperature()) + "\u2103");
         mStatusUpdateAt.setText("Updated at:" + formatTime(setpointRepository.getUpdatedAt()));
 
 
         try {
-            mqttService.getSystemStatus(systemStatus -> {
-                runOnUiThread(() -> {
-                    mTempText.setText(systemStatus.getTemperatureRounded() + "\u2103");
-                    mStatusUpdateAt.setText("Updated at:" + systemStatus.formattedUpdatedAt());
-                });
-            });
+            mqttService.getSystemStatus(systemStatus ->
+                    runOnUiThread(() -> updateSystemStatus(systemStatus)));
         } catch (MqttException e) {
             e.printStackTrace();
         }
 
         offModeButton.setOnClickListener(v -> {
-            heatingControlService.sendCurrentRules(0);
-            setActiveButton(0);
+            heatingControlService.updateConfig(
+                    0,
+                    setpointRepository.getSetpoints(),
+                    systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
         });
 
         onModeButton.setOnClickListener(v -> {
-            heatingControlService.sendCurrentRules(1);
-            setActiveButton(1);
+            heatingControlService.updateConfig(
+                    1,
+                    setpointRepository.getSetpoints(),
+                    systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
         });
 
         defaultModeButton.setOnClickListener(v -> {
-            heatingControlService.sendCurrentRules(2);
-            setActiveButton(2);
+            heatingControlService.updateConfig(
+                    2,
+                    setpointRepository.getSetpoints(),
+                    systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
         });
 
         ValueLineChart mCubicValueLineChart = findViewById(R.id.cubiclinechart);
@@ -178,5 +179,11 @@ public class MainActivity extends AppCompatActivity {
                 offModeButton.setTextColor(Color.parseColor("#E3171616"));
                 return;
         }
+    }
+
+    private void updateSystemStatus(SystemStatus status){
+        mTempText.setText(status.getTemperatureRounded() + "\u2103");
+        mStatusUpdateAt.setText("Updated at:" + status.formattedUpdatedAt());
+        setActiveButton(status.getRulesMode());
     }
 }
