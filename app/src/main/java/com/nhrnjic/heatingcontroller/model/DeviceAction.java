@@ -10,6 +10,7 @@ public class DeviceAction {
     private final String actionType;
     private int rulesMode;
     private List<DbSetpoint> rules;
+    private int rulesSize;
 
     public DeviceAction(String action) {
         this.requestId = UUID.randomUUID();
@@ -30,5 +31,6 @@ public class DeviceAction {
 
     public void setRules(List<DbSetpoint> rules) {
         this.rules = rules;
+        this.rulesSize = rules.size();
     }
 }

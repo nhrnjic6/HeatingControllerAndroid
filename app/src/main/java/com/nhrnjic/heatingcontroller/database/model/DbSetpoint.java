@@ -3,31 +3,26 @@ package com.nhrnjic.heatingcontroller.database.model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.sql.Time;
-
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
-
-public class DbSetpoint extends RealmObject implements Comparable<DbSetpoint> {
-    @PrimaryKey
-    private long id;
+public class DbSetpoint implements Comparable<DbSetpoint> {
+    private int id;
     private int day;
     private int hour;
     private int minute;
     private double temperature;
 
     public DbSetpoint() {
-
+        id = 1;
     }
 
     public DbSetpoint(int day, int hour, int minute, double temperature) {
+        this.id = 1;
         this.day = day;
         this.hour = hour;
         this.minute = minute;
         this.temperature = temperature;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 

@@ -36,7 +36,7 @@ public class SetpointListAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return setpoints.get(position).getId();
+        return position;
     }
 
     @Override

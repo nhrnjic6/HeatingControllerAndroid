@@ -1,14 +1,19 @@
 package com.nhrnjic.heatingcontroller;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.nhrnjic.heatingcontroller.adapter.SetpointListAdapter;
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
@@ -16,7 +21,6 @@ import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
 
 import org.joda.time.DateTime;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class SetpointListActivity extends AppCompatActivity {
@@ -26,6 +30,9 @@ public class SetpointListActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setpoint_list);
+
+        Toolbar toolbar = findViewById(R.id.toolbar_list);
+        setSupportActionBar(toolbar);
 
         Button dayPickerButton = findViewById(R.id.setpoint_day_picker_btn);
         ListView listView = findViewById(R.id.setpoint_list);
@@ -62,5 +69,23 @@ public class SetpointListActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.list_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.setpoint_new:
+                Intent intent = new Intent(SetpointListActivity.this, NewSetpointActivity.class);
+                startActivity(intent);
+                return true;
+        }
+
+        return true;
     }
 }
