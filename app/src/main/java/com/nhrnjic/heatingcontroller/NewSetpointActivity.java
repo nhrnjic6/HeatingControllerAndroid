@@ -8,13 +8,14 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
+import com.nhrnjic.heatingcontroller.exception.FieldNotSetException;
+import com.nhrnjic.heatingcontroller.exception.MaxSetpointSizeException;
 import com.nhrnjic.heatingcontroller.service.HeatingControlService;
 
 import org.joda.time.DateTime;
@@ -33,6 +34,9 @@ public class NewSetpointActivity extends AppCompatActivity {
     private CheckBox mWeekendCb;
 
     private TextView mTempProgress;
+    private TextView mDayError;
+    private TextView mTempError;
+    private TextView mRepeatError;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,6 +56,9 @@ public class NewSetpointActivity extends AppCompatActivity {
         mWeekendCb = findViewById(R.id.new_setpoint_cb_weekend);
 
         mTempProgress = findViewById(R.id.new_setpoint_temperature_progress);
+        mDayError = findViewById(R.id.day_error_msg);
+        mTempError = findViewById(R.id.temperature_error_msg);
+        mRepeatError = findViewById(R.id.repeat_error_msg);
 
         // Setup day picker dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -82,7 +89,7 @@ public class NewSetpointActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mTempProgress.setText("Set temperature: " + progress + " \u2103");
-                setpoint.setTemperature(progress);
+                setpoint.setTemperature((double) progress);
             }
 
             @Override
@@ -96,11 +103,34 @@ public class NewSetpointActivity extends AppCompatActivity {
             }
         });
 
-        mSaveButton.setOnClickListener(v -> heatingControlService.saveNewSetpoint(
-                setpoint, mWorkDayCb.isChecked(), mWeekendCb.isChecked(), systemStatus -> {
-            // react to addition of new setpoint
-                    Intent intent = new Intent(NewSetpointActivity.this, MainActivity.class);
-                    startActivity(intent);
-        }));
+        mSaveButton.setOnClickListener(v -> {
+            mTempError.setVisibility(View.GONE);
+            mDayError.setVisibility(View.GONE);
+            mRepeatError.setVisibility(View.GONE);
+
+            try {
+                heatingControlService.saveNewSetpoint(
+                        setpoint, mWorkDayCb.isChecked(), mWeekendCb.isChecked(), systemStatus -> {
+                            Intent intent = new Intent(NewSetpointActivity.this, MainActivity.class);
+                            startActivity(intent);
+                });
+            } catch (FieldNotSetException e) {
+                if(e.getField().equals("Temperature")){
+                    mTempError.setText(e.getMessage());
+                    mTempError.setVisibility(View.VISIBLE);
+                }else{
+                    mDayError.setText(e.getMessage());
+                    mDayError.setVisibility(View.VISIBLE);
+                }
+            } catch (MaxSetpointSizeException e) {
+                if(e.isRepeat()){
+                    mRepeatError.setText(e.getMessage());
+                    mRepeatError.setVisibility(View.VISIBLE);
+                }else {
+                    mDayError.setText(e.getMessage());
+                    mDayError.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 }

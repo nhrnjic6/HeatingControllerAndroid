@@ -1,69 +1,59 @@
 package com.nhrnjic.heatingcontroller.database.model;
 
+import com.nhrnjic.heatingcontroller.exception.FieldNotSetException;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 public class DbSetpoint implements Comparable<DbSetpoint> {
-    private int id;
-    private int day;
-    private int hour;
-    private int minute;
-    private double temperature;
+    private Integer day;
+    private Integer hour;
+    private Integer minute;
+    private Double temperature;
 
     public DbSetpoint() {
-        id = 1;
     }
 
-    public DbSetpoint(int day, int hour, int minute, double temperature) {
-        this.id = 1;
-        this.day = day;
-        this.hour = hour;
-        this.minute = minute;
-        this.temperature = temperature;
+    public DbSetpoint(DbSetpoint setpoint) {
+        this.day = setpoint.day;
+        this.hour = setpoint.hour;
+        this.minute = setpoint.minute;
+        this.temperature = setpoint.temperature;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public int getDay() {
+    public Integer getDay() {
         return day;
     }
 
-    public void setDay(int day) {
+    public void setDay(Integer day) {
         this.day = day;
     }
 
-    public int getHour() {
+    public Integer getHour() {
         return hour;
     }
 
-    public void setHour(int hour) {
+    public void setHour(Integer hour) {
         this.hour = hour;
     }
 
-    public int getMinute() {
+    public Integer getMinute() {
         return minute;
     }
 
-    public void setMinute(int minute) {
+    public void setMinute(Integer minute) {
         this.minute = minute;
     }
 
-    public double getTemperature() {
+    public Double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(double temperature) {
+    public void setTemperature(Double temperature) {
         this.temperature = temperature;
     }
 
-    @Override
-    public String toString() {
-        return dayToString(day) + " " + hour + ":" + minute + " " + temperature +"\u2103";
-    }
-
-    public String getTimeText(){
+    public String getTimeText() {
         DateTime now = DateTime.now();
         DateTime setpointTime = new DateTime(
                 now.getYear(),
