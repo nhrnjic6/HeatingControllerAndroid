@@ -17,10 +17,9 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class MqttService {
-    public static final String MQTT_BROKER_URL = "tcp://192.168.0.22:1883";
+    public static final String MQTT_BROKER_URL = "tcp://192.168.1.3:1883";
     public static final String STATUS_TOPIC = "sensors/heatingControl/status";
     public static final String ACTION_TOPIC = "sensors/heatingControl/action";
 

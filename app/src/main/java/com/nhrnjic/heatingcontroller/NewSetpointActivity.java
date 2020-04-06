@@ -114,11 +114,19 @@ public class NewSetpointActivity extends AppCompatActivity {
             mRepeatError.setVisibility(View.GONE);
 
             try {
-                heatingControlService.saveNewSetpoint(
-                        mSetpoint, mWorkDayCb.isChecked(), mWeekendCb.isChecked(), systemStatus -> {
-                            Intent intent = new Intent(NewSetpointActivity.this, MainActivity.class);
-                            startActivity(intent);
-                });
+                if(mSetpoint.getId() == null){
+                    heatingControlService.saveNewSetpoint(
+                            mSetpoint, mWorkDayCb.isChecked(), mWeekendCb.isChecked(), systemStatus -> {
+                                Intent intent = new Intent(NewSetpointActivity.this, MainActivity.class);
+                                startActivity(intent);
+                            });
+                }else{
+                    heatingControlService.updateSetpoint(
+                            mSetpoint, systemStatus -> {
+                                Intent intent = new Intent(NewSetpointActivity.this, MainActivity.class);
+                                startActivity(intent);
+                            });
+                }
             } catch (FieldNotSetException e) {
                 if(e.getField().equals("Temperature")){
                     mTempError.setText(e.getMessage());

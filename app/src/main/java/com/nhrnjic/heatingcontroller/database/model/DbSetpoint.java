@@ -8,6 +8,7 @@ import org.joda.time.DateTimeZone;
 import java.io.Serializable;
 
 public class DbSetpoint implements Comparable<DbSetpoint>, Serializable {
+    private Integer id;
     private Integer day;
     private Integer hour;
     private Integer minute;
@@ -17,10 +18,19 @@ public class DbSetpoint implements Comparable<DbSetpoint>, Serializable {
     }
 
     public DbSetpoint(DbSetpoint setpoint) {
+        this.id = id;
         this.day = setpoint.day;
         this.hour = setpoint.hour;
         this.minute = setpoint.minute;
         this.temperature = setpoint.temperature;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public Integer getDay() {

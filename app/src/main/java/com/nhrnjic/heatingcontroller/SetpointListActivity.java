@@ -19,6 +19,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.nhrnjic.heatingcontroller.adapter.SetpointListAdapter;
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
 import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
+import com.nhrnjic.heatingcontroller.service.HeatingControlService;
 
 import org.joda.time.DateTime;
 
@@ -28,6 +29,12 @@ public class SetpointListActivity extends AppCompatActivity {
     public static final String EDIT_SETPOINT_INDEX_KEY = "EDIT_SETPOINT_INDEX";
 
     private SetpointRepository setpointRepository;
+    private HeatingControlService heatingControlService;
+
+    private MenuItem mNewMenuItem;
+    private MenuItem mDeleteMenuItem;
+
+    private int deleteSetpointId = -1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,6 +42,7 @@ public class SetpointListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setpoint_list);
 
         setpointRepository = SetpointRepository.getInstance();
+        heatingControlService = new HeatingControlService();
 
         Toolbar toolbar = findViewById(R.id.toolbar_list);
         setSupportActionBar(toolbar);
@@ -43,10 +51,17 @@ public class SetpointListActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.setpoint_list);
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            DbSetpoint setpoint = setpointRepository.getSetpoints().get(position);
+            DbSetpoint setpoint = setpointRepository.getSetpointById((int) id);
             Intent intent = new Intent(SetpointListActivity.this, NewSetpointActivity.class);
             intent.putExtra(EDIT_SETPOINT_INDEX_KEY, setpoint);
             startActivity(intent);
+        });
+
+        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+            deleteSetpointId = (int) id;
+            mDeleteMenuItem.setVisible(true);
+            mNewMenuItem.setVisible(false);
+            return true;
         });
 
         List<DbSetpoint> setpoints = setpointRepository.getSetpoints(
@@ -84,6 +99,9 @@ public class SetpointListActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.list_menu, menu);
+        mNewMenuItem = menu.findItem(R.id.setpoint_new);
+        mDeleteMenuItem = menu.findItem(R.id.setpoint_delete);
+
         return true;
     }
 
@@ -94,6 +112,10 @@ public class SetpointListActivity extends AppCompatActivity {
                 Intent intent = new Intent(SetpointListActivity.this, NewSetpointActivity.class);
                 startActivity(intent);
                 return true;
+//            case R.id.setpoint_delete:
+//                heatingControlService.deleteSetpoint(deleteSetpointIndex, status -> {
+//
+//                });
         }
 
         return true;

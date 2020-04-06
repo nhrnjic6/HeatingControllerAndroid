@@ -24,12 +24,23 @@ public final class SetpointRepository {
         return setpointRepository;
     }
 
+    public Integer nextId(){
+        List<DbSetpoint> setpoints = getSetpoints();
+        if(setpoints.isEmpty()) return 1;
+
+        return setpoints.get(setpoints.size() - 1).getId() + 1;
+    }
+
     public void setSetpoints(List<DbSetpoint> setpoints) {
         this.setpoints = setpoints;
     }
 
     public void addSetpoint(DbSetpoint setpoint){
         setpoints.add(setpoint);
+    }
+
+    public void removeSetpoint(int index){
+        setpoints.remove(index);
     }
 
     public List<DbSetpoint> getSetpoints(final int day) {
@@ -43,6 +54,23 @@ public final class SetpointRepository {
         return setpoints.stream()
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    public DbSetpoint getSetpointById(Integer id) {
+        return setpoints.stream()
+                .filter(s -> s.getId().equals(id))
+                .findFirst().orElseThrow(RuntimeException::new);
+    }
+
+    public void updateSetpoint(DbSetpoint updatedSetpoint){
+        setpoints = setpoints.stream()
+                .map(setpoint -> {
+                    if(setpoint.getId().equals(updatedSetpoint.getId())){
+                        return updatedSetpoint;
+                    }else {
+                        return setpoint;
+                    }
+                }).collect(Collectors.toList());
     }
 
     public BigDecimal getTemperature() {
