@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -24,6 +25,8 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 public class SetpointListActivity extends AppCompatActivity {
+    public static final String EDIT_SETPOINT_INDEX_KEY = "EDIT_SETPOINT_INDEX";
+
     private SetpointRepository setpointRepository;
 
     @Override
@@ -31,13 +34,20 @@ public class SetpointListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setpoint_list);
 
+        setpointRepository = SetpointRepository.getInstance();
+
         Toolbar toolbar = findViewById(R.id.toolbar_list);
         setSupportActionBar(toolbar);
 
         Button dayPickerButton = findViewById(R.id.setpoint_day_picker_btn);
         ListView listView = findViewById(R.id.setpoint_list);
 
-        setpointRepository = SetpointRepository.getInstance();
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            DbSetpoint setpoint = setpointRepository.getSetpoints().get(position);
+            Intent intent = new Intent(SetpointListActivity.this, NewSetpointActivity.class);
+            intent.putExtra(EDIT_SETPOINT_INDEX_KEY, setpoint);
+            startActivity(intent);
+        });
 
         List<DbSetpoint> setpoints = setpointRepository.getSetpoints(
                 DateTime.now().getDayOfWeek()

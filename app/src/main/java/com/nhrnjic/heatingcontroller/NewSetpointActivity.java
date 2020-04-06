@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.card.MaterialCardView;
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
 import com.nhrnjic.heatingcontroller.exception.FieldNotSetException;
 import com.nhrnjic.heatingcontroller.exception.MaxSetpointSizeException;
@@ -21,7 +22,8 @@ import com.nhrnjic.heatingcontroller.service.HeatingControlService;
 import org.joda.time.DateTime;
 
 public class NewSetpointActivity extends AppCompatActivity {
-    private DbSetpoint setpoint;
+    private DbSetpoint mSetpoint;
+
     private HeatingControlService heatingControlService;
 
     private Button mDayButton;
@@ -29,6 +31,7 @@ public class NewSetpointActivity extends AppCompatActivity {
     private Button mSaveButton;
 
     private SeekBar mTempBar;
+    private MaterialCardView mRepeatConfigParent;
 
     private CheckBox mWorkDayCb;
     private CheckBox mWeekendCb;
@@ -43,7 +46,6 @@ public class NewSetpointActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_setpoint);
 
-        setpoint = new DbSetpoint();
         heatingControlService = new HeatingControlService();
 
         mDayButton = findViewById(R.id.new_setpoint_day);
@@ -51,6 +53,7 @@ public class NewSetpointActivity extends AppCompatActivity {
         mSaveButton = findViewById(R.id.new_setpoint_save);
 
         mTempBar = findViewById(R.id.new_setpoint_temperature);
+        mRepeatConfigParent = findViewById(R.id.repeat_config_parent);
 
         mWorkDayCb = findViewById(R.id.new_setpoint_cb_workday);
         mWeekendCb = findViewById(R.id.new_setpoint_cb_weekend);
@@ -60,6 +63,8 @@ public class NewSetpointActivity extends AppCompatActivity {
         mTempError = findViewById(R.id.temperature_error_msg);
         mRepeatError = findViewById(R.id.repeat_error_msg);
 
+        setupUIWithData();
+
         // Setup day picker dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose day of week");
@@ -67,7 +72,7 @@ public class NewSetpointActivity extends AppCompatActivity {
         String[] daysOfWeek = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
         builder.setItems(daysOfWeek, (dialog, which) -> {
             mDayButton.setText(daysOfWeek[which]);
-            setpoint.setDay(which + 1);
+            mSetpoint.setDay(which + 1);
         });
 
         final AlertDialog dialog = builder.create();
@@ -76,10 +81,10 @@ public class NewSetpointActivity extends AppCompatActivity {
         // Setup time picker dialog
         TimePickerDialog timePickerDialog = new TimePickerDialog(this,
                 (view, hourOfDay, minute) -> {
-                    setpoint.setHour(hourOfDay);
-                    setpoint.setMinute(minute);
+                    mSetpoint.setHour(hourOfDay);
+                    mSetpoint.setMinute(minute);
                     DateTime now = DateTime.now();
-                    mTimeButton.setText(setpoint.getTimeText());
+                    mTimeButton.setText(mSetpoint.getTimeText());
                 }, 0, 0, true);
 
         mTimeButton.setOnClickListener(v -> timePickerDialog.show());
@@ -89,7 +94,7 @@ public class NewSetpointActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mTempProgress.setText("Set temperature: " + progress + " \u2103");
-                setpoint.setTemperature((double) progress);
+                mSetpoint.setTemperature((double) progress);
             }
 
             @Override
@@ -110,7 +115,7 @@ public class NewSetpointActivity extends AppCompatActivity {
 
             try {
                 heatingControlService.saveNewSetpoint(
-                        setpoint, mWorkDayCb.isChecked(), mWeekendCb.isChecked(), systemStatus -> {
+                        mSetpoint, mWorkDayCb.isChecked(), mWeekendCb.isChecked(), systemStatus -> {
                             Intent intent = new Intent(NewSetpointActivity.this, MainActivity.class);
                             startActivity(intent);
                 });
@@ -132,5 +137,22 @@ public class NewSetpointActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void setupUIWithData(){
+        DbSetpoint setpoint = (DbSetpoint) getIntent()
+                .getSerializableExtra(SetpointListActivity.EDIT_SETPOINT_INDEX_KEY);
+
+        if(setpoint != null){
+            mSetpoint = setpoint;
+            mDayButton.setText(mSetpoint.dayToString());
+            mTimeButton.setText(mSetpoint.getTimeText());
+            mTempBar.setProgress(mSetpoint.getTemperature().intValue());
+            mTempBar.refreshDrawableState();
+            mRepeatConfigParent.setVisibility(View.GONE);
+            mTempProgress.setText("Set temperature: " + mSetpoint.getTemperature().intValue() + " \u2103");
+        }else{
+            mSetpoint = new DbSetpoint();
+        }
     }
 }

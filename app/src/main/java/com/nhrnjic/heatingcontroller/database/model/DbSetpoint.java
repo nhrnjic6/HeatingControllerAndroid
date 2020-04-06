@@ -5,7 +5,9 @@ import com.nhrnjic.heatingcontroller.exception.FieldNotSetException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-public class DbSetpoint implements Comparable<DbSetpoint> {
+import java.io.Serializable;
+
+public class DbSetpoint implements Comparable<DbSetpoint>, Serializable {
     private Integer day;
     private Integer hour;
     private Integer minute;
@@ -70,7 +72,7 @@ public class DbSetpoint implements Comparable<DbSetpoint> {
         return temperature + "\u2103";
     }
 
-    private String dayToString(int day){
+    public String dayToString(){
         switch (day){
             case 1: return "Monday";
             case 2: return "Tuesday";
