@@ -54,16 +54,29 @@ public class SetpointListActivity extends AppCompatActivity {
         ListView mSetpointsListView = findViewById(R.id.setpoint_list);
 
         mSetpointsListView.setOnItemClickListener((parent, view, position, id) -> {
-            DbSetpoint setpoint = setpointRepository.getSetpointById((int) id);
-            Intent intent = new Intent(SetpointListActivity.this, NewSetpointActivity.class);
-            intent.putExtra(EDIT_SETPOINT_INDEX_KEY, setpoint);
-            startActivity(intent);
+            if(deleteSetpointId != -1){
+                deleteSetpointId = -1;
+                mDeleteMenuItem.setVisible(false);
+                mNewMenuItem.setVisible(true);
+            }else {
+                DbSetpoint setpoint = setpointRepository.getSetpointById((int) id);
+                Intent intent = new Intent(SetpointListActivity.this, NewSetpointActivity.class);
+                intent.putExtra(EDIT_SETPOINT_INDEX_KEY, setpoint);
+                startActivity(intent);
+            }
         });
 
         mSetpointsListView.setOnItemLongClickListener((parent, view, position, id) -> {
-            deleteSetpointId = (int) id;
-            mDeleteMenuItem.setVisible(true);
-            mNewMenuItem.setVisible(false);
+            if(deleteSetpointId != -1){
+                deleteSetpointId = -1;
+                mDeleteMenuItem.setVisible(false);
+                mNewMenuItem.setVisible(true);
+            }else{
+                deleteSetpointId = (int) id;
+                mDeleteMenuItem.setVisible(true);
+                mNewMenuItem.setVisible(false);
+            }
+
             return true;
         });
 
@@ -94,6 +107,9 @@ public class SetpointListActivity extends AppCompatActivity {
         dayPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                deleteSetpointId = -1;
+                mDeleteMenuItem.setVisible(false);
+                mNewMenuItem.setVisible(true);
                 dialog.show();
             }
         });
