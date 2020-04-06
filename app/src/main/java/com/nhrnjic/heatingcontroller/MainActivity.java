@@ -75,23 +75,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         offModeButton.setOnClickListener(v -> {
-            heatingControlService.updateConfig(
+            heatingControlService.changeRulesMode(
                     0,
-                    setpointRepository.getSetpoints(),
                     systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
         });
 
         onModeButton.setOnClickListener(v -> {
-            heatingControlService.updateConfig(
+            heatingControlService.changeRulesMode(
                     1,
-                    setpointRepository.getSetpoints(),
                     systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
         });
 
         defaultModeButton.setOnClickListener(v -> {
-            heatingControlService.updateConfig(
+            heatingControlService.changeRulesMode(
                     2,
-                    setpointRepository.getSetpoints(),
                     systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
         });
 

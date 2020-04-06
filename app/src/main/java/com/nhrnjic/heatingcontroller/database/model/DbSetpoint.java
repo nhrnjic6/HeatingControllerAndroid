@@ -1,74 +1,71 @@
 package com.nhrnjic.heatingcontroller.database.model;
 
+import com.nhrnjic.heatingcontroller.exception.FieldNotSetException;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.sql.Time;
+import java.io.Serializable;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
-
-public class DbSetpoint extends RealmObject implements Comparable<DbSetpoint> {
-    @PrimaryKey
-    private long id;
-    private int day;
-    private int hour;
-    private int minute;
-    private double temperature;
+public class DbSetpoint implements Comparable<DbSetpoint>, Serializable {
+    private Integer id;
+    private Integer day;
+    private Integer hour;
+    private Integer minute;
+    private Double temperature;
 
     public DbSetpoint() {
-
     }
 
-    public DbSetpoint(int day, int hour, int minute, double temperature) {
-        this.day = day;
-        this.hour = hour;
-        this.minute = minute;
-        this.temperature = temperature;
+    public DbSetpoint(DbSetpoint setpoint) {
+        this.id = id;
+        this.day = setpoint.day;
+        this.hour = setpoint.hour;
+        this.minute = setpoint.minute;
+        this.temperature = setpoint.temperature;
     }
 
-    public long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public int getDay() {
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getDay() {
         return day;
     }
 
-    public void setDay(int day) {
+    public void setDay(Integer day) {
         this.day = day;
     }
 
-    public int getHour() {
+    public Integer getHour() {
         return hour;
     }
 
-    public void setHour(int hour) {
+    public void setHour(Integer hour) {
         this.hour = hour;
     }
 
-    public int getMinute() {
+    public Integer getMinute() {
         return minute;
     }
 
-    public void setMinute(int minute) {
+    public void setMinute(Integer minute) {
         this.minute = minute;
     }
 
-    public double getTemperature() {
+    public Double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(double temperature) {
+    public void setTemperature(Double temperature) {
         this.temperature = temperature;
     }
 
-    @Override
-    public String toString() {
-        return dayToString(day) + " " + hour + ":" + minute + " " + temperature +"\u2103";
-    }
-
-    public String getTimeText(){
+    public String getTimeText() {
         DateTime now = DateTime.now();
         DateTime setpointTime = new DateTime(
                 now.getYear(),
@@ -85,7 +82,7 @@ public class DbSetpoint extends RealmObject implements Comparable<DbSetpoint> {
         return temperature + "\u2103";
     }
 
-    private String dayToString(int day){
+    public String dayToString(){
         switch (day){
             case 1: return "Monday";
             case 2: return "Tuesday";
