@@ -39,8 +39,10 @@ public final class SetpointRepository {
         setpoints.add(setpoint);
     }
 
-    public void removeSetpoint(int index){
-        setpoints.remove(index);
+    public void removeSetpoint(Integer id){
+        setpoints = setpoints.stream()
+                .filter(s -> !s.getId().equals(id))
+                .collect(Collectors.toList());
     }
 
     public List<DbSetpoint> getSetpoints(final int day) {
