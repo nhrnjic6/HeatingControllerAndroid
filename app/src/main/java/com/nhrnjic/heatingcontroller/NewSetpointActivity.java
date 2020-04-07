@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -25,6 +26,8 @@ public class NewSetpointActivity extends AppCompatActivity {
     private DbSetpoint mSetpoint;
 
     private HeatingControlService heatingControlService;
+
+    private FrameLayout mProgressWheelParent;
 
     private Button mDayButton;
     private Button mTimeButton;
@@ -47,6 +50,8 @@ public class NewSetpointActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_setpoint);
 
         heatingControlService = new HeatingControlService();
+
+        mProgressWheelParent = findViewById(R.id.progress_wheel_parent);
 
         mDayButton = findViewById(R.id.new_setpoint_day);
         mTimeButton = findViewById(R.id.new_setpoint_time);
@@ -109,6 +114,7 @@ public class NewSetpointActivity extends AppCompatActivity {
         });
 
         mSaveButton.setOnClickListener(v -> {
+            mProgressWheelParent.setVisibility(View.VISIBLE);
             mTempError.setVisibility(View.GONE);
             mDayError.setVisibility(View.GONE);
             mRepeatError.setVisibility(View.GONE);
@@ -117,17 +123,24 @@ public class NewSetpointActivity extends AppCompatActivity {
                 if(mSetpoint.getId() == null){
                     heatingControlService.saveNewSetpoint(
                             mSetpoint, mWorkDayCb.isChecked(), mWeekendCb.isChecked(), systemStatus -> {
-                                Intent intent = new Intent(NewSetpointActivity.this, MainActivity.class);
-                                startActivity(intent);
+                                runOnUiThread(() -> {
+                                    Intent intent = new Intent(NewSetpointActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                });
                             });
                 }else{
                     heatingControlService.updateSetpoint(
                             mSetpoint, systemStatus -> {
-                                Intent intent = new Intent(NewSetpointActivity.this, MainActivity.class);
-                                startActivity(intent);
+                                runOnUiThread(() -> {
+                                    Intent intent = new Intent(NewSetpointActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                });
                             });
                 }
             } catch (FieldNotSetException e) {
+                mProgressWheelParent.setVisibility(View.GONE);
                 if(e.getField().equals("Temperature")){
                     mTempError.setText(e.getMessage());
                     mTempError.setVisibility(View.VISIBLE);
@@ -136,6 +149,7 @@ public class NewSetpointActivity extends AppCompatActivity {
                     mDayError.setVisibility(View.VISIBLE);
                 }
             } catch (MaxSetpointSizeException e) {
+                mProgressWheelParent.setVisibility(View.GONE);
                 if(e.isRepeat()){
                     mRepeatError.setText(e.getMessage());
                     mRepeatError.setVisibility(View.VISIBLE);

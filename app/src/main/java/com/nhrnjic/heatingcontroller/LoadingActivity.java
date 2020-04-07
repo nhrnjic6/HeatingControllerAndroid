@@ -1,6 +1,7 @@
 package com.nhrnjic.heatingcontroller;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
 import com.nhrnjic.heatingcontroller.service.MqttService;
+import com.pnikosis.materialishprogress.ProgressWheel;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -21,6 +23,9 @@ public class LoadingActivity extends AppCompatActivity {
 
         MqttService mqttService = MqttService.getInstance(this);
         SetpointRepository repository = SetpointRepository.getInstance();
+
+        ProgressWheel wheel = new ProgressWheel(this);
+        wheel.setBarColor(Color.BLUE);
 
         try {
             mqttService.initConnection(new IMqttActionListener() {
