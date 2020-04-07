@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,8 @@ public class SetpointListActivity extends AppCompatActivity {
     private SetpointRepository setpointRepository;
     private HeatingControlService heatingControlService;
 
+    private FrameLayout mProgressWheelParent;
+
     private MenuItem mNewMenuItem;
     private MenuItem mDeleteMenuItem;
 
@@ -46,6 +49,8 @@ public class SetpointListActivity extends AppCompatActivity {
 
         setpointRepository = SetpointRepository.getInstance();
         heatingControlService = new HeatingControlService();
+
+        mProgressWheelParent = findViewById(R.id.progress_wheel_parent);
 
         Toolbar toolbar = findViewById(R.id.toolbar_list);
         setSupportActionBar(toolbar);
@@ -132,6 +137,7 @@ public class SetpointListActivity extends AppCompatActivity {
                 startActivity(intentNewActivity);
                 break;
             case R.id.setpoint_delete:
+                mProgressWheelParent.setVisibility(View.VISIBLE);
                 heatingControlService.deleteSetpoint(deleteSetpointId, status -> {
                     List<DbSetpoint> setpoints = setpointRepository.getSetpoints(mSelectedDay);
 
@@ -141,6 +147,7 @@ public class SetpointListActivity extends AppCompatActivity {
 
                         mDeleteMenuItem.setVisible(false);
                         mNewMenuItem.setVisible(true);
+                        mProgressWheelParent.setVisibility(View.GONE);
                     });
                 });
                 break;
