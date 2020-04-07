@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<FrameLayout android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:wheel="http://schemas.android.com/apk/res-auto">
 
-<LinearLayout android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        xmlns:android="http://schemas.android.com/apk/res/android">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -23,200 +27,222 @@
             android:fitsSystemWindows="true"
             xmlns:android="http://schemas.android.com/apk/res/android">
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="15dp"
-            tools:context=".MainActivity">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_system_status"
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent"
+                android:padding="15dp"
+                tools:context=".MainActivity">
 
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_system_status"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="15dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="System Status"
-                        android:textSize="20dp"/>
-
-                    <TextView
-                        android:id="@+id/tv_status_update_at"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Updated at: 20:20:20"
-                        android:textSize="10dp"/>
-
-                    <TextView
-                        android:id="@+id/temperature"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawableLeft="@mipmap/ic_temperature"
-                        android:layout_marginTop="10dp"
-                        android:paddingLeft="-15dp"
-                        android:text="50&#8451;"
-                        android:textSize="30dp"/>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/card_system_status"
-                android:layout_marginTop="10dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="15dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Upcoming setpoint"
-                        android:textSize="16dp"/>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Monday 10:00 with max temperature at 50&#8451;"
-                        android:layout_marginTop="10dp"/>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_upcoming_setpoint"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/card_system_status"
-                android:layout_marginTop="10dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="15dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Upcoming setpoint"
-                        android:textSize="16dp"/>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Monday 10:00 with max temperature at 50&#8451;"
-                        android:layout_marginTop="10dp"/>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_heater_mode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/card_upcoming_setpoint"
-                android:layout_marginTop="10dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="15dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Heater Mode"/>
+                    android:layout_height="wrap_content">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="10dp">
+                        android:orientation="vertical"
+                        android:padding="15dp">
 
-                        <Button
-                            android:id="@+id/btn_default_mode"
-                            android:layout_width="0dp"
+                        <TextView
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textColor="#E3171616"
-                            android:text="DEFAULT"/>
+                            android:text="System Status"
+                            android:textSize="20dp"/>
 
-                        <Button
-                            android:id="@+id/btn_on_mode"
-                            android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/tv_status_update_at"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textColor="#E3171616"
-                            android:text="ON"/>
+                            android:text="Updated at: 20:20:20"
+                            android:textSize="10dp"/>
 
-                        <Button
-                            android:id="@+id/btn_off_mode"
-                            android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/temperature"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textColor="#E3171616"
-                            android:text="OFF"/>
+                            android:drawableLeft="@mipmap/ic_temperature"
+                            android:layout_marginTop="10dp"
+                            android:paddingLeft="-15dp"
+                            android:text="50&#8451;"
+                            android:textSize="30dp"/>
 
                     </LinearLayout>
 
-                </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_temperature_chart"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/card_heater_mode">
-
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="15dp">
+                    android:layout_below="@id/card_system_status"
+                    android:layout_marginTop="10dp">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Temperature over time"/>
+                        android:orientation="vertical"
+                        android:padding="15dp">
 
-                    <org.eazegraph.lib.charts.ValueLineChart
-                        android:layout_marginTop="10dp"
-                        xmlns:app="http://schemas.android.com/apk/res-auto"
-                        android:id="@+id/cubiclinechart"
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Upcoming setpoint"
+                            android:textSize="16dp"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Monday 10:00 with max temperature at 50&#8451;"
+                            android:layout_marginTop="10dp"/>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_upcoming_setpoint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/card_system_status"
+                    android:layout_marginTop="10dp">
+
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        app:egUseCubic="true"
-                        app:egUseOverlapFill="true"
-                        app:egCurveSmoothness="0.4"
-                        app:egIndicatorLineColor="#FE6DA8"
-                        app:egLegendHeight="40dp"
-                        app:egShowStandardValue="true"/>
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="15dp">
 
-                </LinearLayout>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Upcoming setpoint"
+                            android:textSize="16dp"/>
 
-            </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Monday 10:00 with max temperature at 50&#8451;"
+                            android:layout_marginTop="10dp"/>
 
-        </RelativeLayout>
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_heater_mode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/card_upcoming_setpoint"
+                    android:layout_marginTop="10dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="15dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Heater Mode"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="10dp">
+
+                            <Button
+                                android:id="@+id/btn_default_mode"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="#E3171616"
+                                android:text="DEFAULT"/>
+
+                            <Button
+                                android:id="@+id/btn_on_mode"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="#E3171616"
+                                android:text="ON"/>
+
+                            <Button
+                                android:id="@+id/btn_off_mode"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="#E3171616"
+                                android:text="OFF"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_temperature_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/card_heater_mode">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="15dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Temperature over time"/>
+
+                        <org.eazegraph.lib.charts.ValueLineChart
+                            android:layout_marginTop="10dp"
+                            xmlns:app="http://schemas.android.com/apk/res-auto"
+                            android:id="@+id/cubiclinechart"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            app:egUseCubic="true"
+                            app:egUseOverlapFill="true"
+                            app:egCurveSmoothness="0.4"
+                            app:egIndicatorLineColor="#FE6DA8"
+                            app:egLegendHeight="40dp"
+                            app:egShowStandardValue="true"/>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </RelativeLayout>
 
         </ScrollView>
 
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/progress_wheel_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <com.pnikosis.materialishprogress.ProgressWheel
+            android:id="@+id/progress_wheel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@color/colorPrimary"
+            wheel:matProg_barColor="#5588FF"
+            wheel:matProg_progressIndeterminate="true" />
+
+    </FrameLayout>
+
+</FrameLayout>
 

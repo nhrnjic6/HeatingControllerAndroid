@@ -10,7 +10,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.nhrnjic.heatingcontroller.model.SystemStatus;
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private SetpointRepository setpointRepository = SetpointRepository.getInstance();
     private MqttService mqttService;
 
+    private FrameLayout mProgressWheelParent;
+
     private TextView mTempText;
     private TextView mStatusUpdateAt;
 
@@ -52,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mProgressWheelParent = findViewById(R.id.progress_wheel_parent);
 
         mStatusUpdateAt = findViewById(R.id.tv_status_update_at);
         mTempText = findViewById(R.id.temperature);
@@ -75,21 +81,33 @@ public class MainActivity extends AppCompatActivity {
         }
 
         offModeButton.setOnClickListener(v -> {
+            mProgressWheelParent.setVisibility(View.VISIBLE);
             heatingControlService.changeRulesMode(
                     0,
-                    systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
+                    systemStatus -> runOnUiThread(() -> {
+                        updateSystemStatus(systemStatus);
+                        mProgressWheelParent.setVisibility(View.GONE);
+                    }));
         });
 
         onModeButton.setOnClickListener(v -> {
+            mProgressWheelParent.setVisibility(View.VISIBLE);
             heatingControlService.changeRulesMode(
                     1,
-                    systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
+                    systemStatus -> runOnUiThread(() -> {
+                        updateSystemStatus(systemStatus);
+                        mProgressWheelParent.setVisibility(View.GONE);
+                    }));
         });
 
         defaultModeButton.setOnClickListener(v -> {
+            mProgressWheelParent.setVisibility(View.VISIBLE);
             heatingControlService.changeRulesMode(
                     2,
-                    systemStatus -> runOnUiThread(() -> updateSystemStatus(systemStatus)));
+                    systemStatus -> runOnUiThread(() -> {
+                        updateSystemStatus(systemStatus);
+                        mProgressWheelParent.setVisibility(View.GONE);
+                    }));
         });
 
         ValueLineChart mCubicValueLineChart = findViewById(R.id.cubiclinechart);
