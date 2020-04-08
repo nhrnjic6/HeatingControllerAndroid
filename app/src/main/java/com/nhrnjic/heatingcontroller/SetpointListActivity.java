@@ -121,11 +121,15 @@ public class SetpointListActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.list_menu, menu);
         mNewMenuItem = menu.findItem(R.id.setpoint_new);
         mDeleteMenuItem = menu.findItem(R.id.setpoint_delete);
-
         return true;
     }
 

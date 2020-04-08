@@ -11,20 +11,20 @@ import java.util.UUID;
 
 public class SystemStatus {
     private UUID requestId;
-    private String id;
+    private Integer id;
     private BigDecimal temperature;
-    private long updatedAt;
-    private int rulesMode;
+    private Long updatedAt;
+    private Integer rulesMode;
     private List<DbSetpoint> rules;
 
     public SystemStatus() {
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -41,11 +41,11 @@ public class SystemStatus {
         this.temperature = temperature;
     }
 
-    public long getUpdatedAt() {
+    public Long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(long updatedAt) {
+    public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -57,11 +57,11 @@ public class SystemStatus {
         this.rules = rules;
     }
 
-    public int getRulesMode() {
+    public Integer getRulesMode() {
         return rulesMode;
     }
 
-    public void setRulesMode(int rulesMode) {
+    public void setRulesMode(Integer rulesMode) {
         this.rulesMode = rulesMode;
     }
 

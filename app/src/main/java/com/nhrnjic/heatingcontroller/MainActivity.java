@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
 import com.nhrnjic.heatingcontroller.model.SystemStatus;
 import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
 import com.nhrnjic.heatingcontroller.service.HeatingControlService;
@@ -24,10 +25,6 @@ import org.eazegraph.lib.charts.ValueLineChart;
 import org.eazegraph.lib.models.ValueLinePoint;
 import org.eazegraph.lib.models.ValueLineSeries;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
-import java.math.BigDecimal;
 
 public class MainActivity extends AppCompatActivity {
     private HeatingControlService heatingControlService = new HeatingControlService();
@@ -38,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mTempText;
     private TextView mStatusUpdateAt;
+    private TextView mActiveSetpointLabel;
+    private TextView mActiveSetpoint;
 
     private Button defaultModeButton;
     private Button onModeButton;
@@ -61,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
         mStatusUpdateAt = findViewById(R.id.tv_status_update_at);
         mTempText = findViewById(R.id.temperature);
+        mActiveSetpointLabel = findViewById(R.id.active_setpoint_label);
+        mActiveSetpoint = findViewById(R.id.active_setpoint);
+
         defaultModeButton = findViewById(R.id.btn_default_mode);
         defaultButtonDrawable = defaultModeButton.getBackground();
         onModeButton = findViewById(R.id.btn_on_mode);
@@ -68,14 +70,13 @@ public class MainActivity extends AppCompatActivity {
         offModeButton = findViewById(R.id.btn_off_mode);
         offButtonDrawable = offModeButton.getBackground();
 
-        setActiveButton(setpointRepository.getHeaterMode());
-        mTempText.setText(roundTemperature(setpointRepository.getTemperature()) + "\u2103");
-        mStatusUpdateAt.setText("Updated at:" + formatTime(setpointRepository.getUpdatedAt()));
-
+        updateSystemStatus();
 
         try {
-            mqttService.getSystemStatus(systemStatus ->
-                    runOnUiThread(() -> updateSystemStatus(systemStatus)));
+            mqttService.getSystemStatus(systemStatus -> {
+                setpointRepository.setSystemStatus(systemStatus);
+                updateSystemStatus();
+            });
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -84,30 +85,21 @@ public class MainActivity extends AppCompatActivity {
             mProgressWheelParent.setVisibility(View.VISIBLE);
             heatingControlService.changeRulesMode(
                     0,
-                    systemStatus -> runOnUiThread(() -> {
-                        updateSystemStatus(systemStatus);
-                        mProgressWheelParent.setVisibility(View.GONE);
-                    }));
+                    systemStatus -> updateSystemStatus());
         });
 
         onModeButton.setOnClickListener(v -> {
             mProgressWheelParent.setVisibility(View.VISIBLE);
             heatingControlService.changeRulesMode(
                     1,
-                    systemStatus -> runOnUiThread(() -> {
-                        updateSystemStatus(systemStatus);
-                        mProgressWheelParent.setVisibility(View.GONE);
-                    }));
+                    systemStatus -> updateSystemStatus());
         });
 
         defaultModeButton.setOnClickListener(v -> {
             mProgressWheelParent.setVisibility(View.VISIBLE);
             heatingControlService.changeRulesMode(
                     2,
-                    systemStatus -> runOnUiThread(() -> {
-                        updateSystemStatus(systemStatus);
-                        mProgressWheelParent.setVisibility(View.GONE);
-                    }));
+                    systemStatus -> updateSystemStatus());
         });
 
         ValueLineChart mCubicValueLineChart = findViewById(R.id.cubiclinechart);
@@ -133,6 +125,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateSystemStatus();
+    }
+
+    @Override
+    public void onBackPressed() {
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
@@ -148,16 +150,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return true;
-    }
-
-    private String roundTemperature(BigDecimal temperature) {
-        temperature = temperature.setScale(2 , BigDecimal.ROUND_HALF_UP);
-        return temperature.toString();
-    }
-
-    private String formatTime(long milis){
-        return new DateTime(milis * 1000, DateTimeZone.UTC)
-                .toString("HH:mm:ss");
     }
 
     private void setActiveButton(int heaterMode){
@@ -196,9 +188,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateSystemStatus(SystemStatus status){
-        mTempText.setText(status.getTemperatureRounded() + "\u2103");
-        mStatusUpdateAt.setText("Updated at:" + status.formattedUpdatedAt());
-        setActiveButton(status.getRulesMode());
+    private void updateSystemStatus(){
+        SystemStatus status = setpointRepository.getSystemStatus();
+
+        runOnUiThread(() -> {
+            mTempText.setText(status.getTemperatureRounded() + "\u2103");
+            mStatusUpdateAt.setText("Updated at:" + status.formattedUpdatedAt());
+            setActiveButton(status.getRulesMode());
+            updateActiveSetpointUI(status);
+            mProgressWheelParent.setVisibility(View.GONE);
+        });
+    }
+
+    private void updateActiveSetpointUI(SystemStatus systemStatus){
+        if(systemStatus.getRules().isEmpty()){
+            mActiveSetpointLabel.setText("Upcoming setpoint");
+            mActiveSetpoint.setText("No upcoming setpoints");
+            return;
+        }
+
+        if(systemStatus.getId() == -1){
+            mActiveSetpointLabel.setText("Upcoming setpoint");
+            DbSetpoint upcomingSetpoint = setpointRepository.findNextSetpoint();
+            if(upcomingSetpoint == null){
+                mActiveSetpoint.setText("No upcoming setpoints");
+            }else{
+                mActiveSetpoint.setText(upcomingSetpoint.dayToString() + " " + upcomingSetpoint.getTimeText() + " with max temperature at " + upcomingSetpoint.getTemperatureText());
+            }
+            return;
+        }
+
+        DbSetpoint activeSetpoint = setpointRepository.getSetpointById(systemStatus.getId());
+        mActiveSetpointLabel.setText("Active setpoint");
+        mActiveSetpoint.setText(activeSetpoint.dayToString() + " " + activeSetpoint.getTimeText() + " with max temperature at " + activeSetpoint.getTemperatureText());
     }
 }

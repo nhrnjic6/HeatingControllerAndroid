@@ -1,6 +1,9 @@
 package com.nhrnjic.heatingcontroller.repository;
 
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
+import com.nhrnjic.heatingcontroller.model.SystemStatus;
+
+import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,7 +13,7 @@ import java.util.stream.Collectors;
 public final class SetpointRepository {
     private BigDecimal temperature;
     private int heaterMode;
-    private String currentRuleId;
+    private Integer currentRuleId;
     private long updatedAt;
     private List<DbSetpoint> setpoints;
 
@@ -24,25 +27,42 @@ public final class SetpointRepository {
         return setpointRepository;
     }
 
-    public Integer nextId(){
-        List<DbSetpoint> setpoints = getSetpoints();
-        if(setpoints.isEmpty()) return 1;
+    public SystemStatus getSystemStatus(){
+        SystemStatus systemStatus = new SystemStatus();
+        systemStatus.setRulesMode(heaterMode);
+        systemStatus.setRules(setpoints);
+        systemStatus.setTemperature(temperature);
+        systemStatus.setId(currentRuleId);
+        systemStatus.setUpdatedAt(updatedAt);
 
-        return setpoints.get(setpoints.size() - 1).getId() + 1;
+        return systemStatus;
+    }
+
+    public void setSystemStatus(SystemStatus systemStatus){
+        temperature = systemStatus.getTemperature();
+        currentRuleId = systemStatus.getId();
+        updatedAt = systemStatus.getUpdatedAt();
+
+        if(systemStatus.getRulesMode() != null){
+            heaterMode = systemStatus.getRulesMode();
+        }
+
+        if(systemStatus.getRules() != null){
+            setpoints = systemStatus.getRules();
+        }
+    }
+
+    public Integer nextId(){
+        List<DbSetpoint> sortedByIdDesc = setpoints.stream()
+                .sorted((e1, e2) -> e2.getId() - e1.getId())
+                .collect(Collectors.toList());
+
+        if(sortedByIdDesc.isEmpty()) return 1;
+        return sortedByIdDesc.get(0).getId() + 1;
     }
 
     public void setSetpoints(List<DbSetpoint> setpoints) {
         this.setpoints = setpoints;
-    }
-
-    public void addSetpoint(DbSetpoint setpoint){
-        setpoints.add(setpoint);
-    }
-
-    public void removeSetpoint(Integer id){
-        setpoints = setpoints.stream()
-                .filter(s -> !s.getId().equals(id))
-                .collect(Collectors.toList());
     }
 
     public List<DbSetpoint> getSetpoints(final int day) {
@@ -64,15 +84,14 @@ public final class SetpointRepository {
                 .findFirst().orElseThrow(RuntimeException::new);
     }
 
-    public void updateSetpoint(DbSetpoint updatedSetpoint){
-        setpoints = setpoints.stream()
-                .map(setpoint -> {
-                    if(setpoint.getId().equals(updatedSetpoint.getId())){
-                        return updatedSetpoint;
-                    }else {
-                        return setpoint;
-                    }
-                }).collect(Collectors.toList());
+    public DbSetpoint findNextSetpoint(){
+        DateTime now = DateTime.now();
+        long weekPassedMinutes = ((now.getDayOfWeek() - 1) * 24 * 60) + (now.getHourOfDay() * 60) + now.getMinuteOfHour();
+
+        return setpoints.stream()
+                .filter(s -> s.getWeekInstant() > weekPassedMinutes)
+                .findFirst()
+                .orElse(null);
     }
 
     public BigDecimal getTemperature() {
@@ -91,11 +110,11 @@ public final class SetpointRepository {
         this.heaterMode = heaterMode;
     }
 
-    public String getCurrentRuleId() {
+    public Integer getCurrentRuleId() {
         return currentRuleId;
     }
 
-    public void setCurrentRuleId(String currentRuleId) {
+    public void setCurrentRuleId(Integer currentRuleId) {
         this.currentRuleId = currentRuleId;
     }
 

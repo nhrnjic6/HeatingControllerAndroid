@@ -9,8 +9,13 @@ import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class HeatingControlService {
-    private static final int MAX_SIZE_PER_DAY = 2;
+    private static final int MAX_SIZE_PER_DAY = 5;
+    public static final String SET_SETPOINTS_ACTION = "set_setpoints";
 
     private MqttService mqttService;
     private SetpointRepository setpointRepository;
@@ -23,15 +28,11 @@ public class HeatingControlService {
     public void changeRulesMode(
             int rulesMode,
             SystemStatusListener listener){
-        DeviceAction action = new DeviceAction("set_setpoints");
+        DeviceAction action = new DeviceAction(SET_SETPOINTS_ACTION);
         action.setRulesMode(rulesMode);
         action.setRules(setpointRepository.getSetpoints());
 
-        try {
-            mqttService.sendAction(action, listener);
-        } catch (MqttException e) {
-            System.out.println("Failed sending action to device");
-        }
+        sendAction(action, listener);
     }
 
     public void saveNewSetpoint(
@@ -41,49 +42,80 @@ public class HeatingControlService {
             SystemStatusListener listener)
             throws FieldNotSetException, MaxSetpointSizeException {
         validateSetpoint(setpoint, repeatWorkDay, repeatWeekend);
-        setpoint.setId(setpointRepository.nextId());
-        setpointRepository.addSetpoint(setpoint);
 
-        DeviceAction action = new DeviceAction("set_setpoints");
-        action.setRulesMode(setpointRepository.getHeaterMode());
-        action.setRules(setpointRepository.getSetpoints());
+        List<DbSetpoint> setpoints = setpointRepository.getSetpoints();
 
-        try {
-            mqttService.sendAction(action, listener);
-        } catch (MqttException e) {
-            System.out.println("Failed sending action to device");
+        if(repeatWorkDay){
+            IntStream.rangeClosed(1,5).forEach(day -> {
+                DbSetpoint newSetpoint = new DbSetpoint(setpoint);
+                newSetpoint.setId(setpointRepository.nextId());
+                newSetpoint.setDay(day);
+                setpoints.add(newSetpoint);
+            });
         }
+
+        if(repeatWeekend){
+            IntStream.rangeClosed(6,7).forEach(day -> {
+                DbSetpoint newSetpoint = new DbSetpoint(setpoint);
+                newSetpoint.setId(setpointRepository.nextId());
+                newSetpoint.setDay(day);
+                setpoints.add(newSetpoint);
+            });
+        }
+
+        if(!repeatWorkDay && !repeatWeekend){
+            setpoint.setId(setpointRepository.nextId());
+            setpoints.add(setpoint);
+        }
+
+        DeviceAction action = new DeviceAction(SET_SETPOINTS_ACTION);
+        action.setRulesMode(setpointRepository.getHeaterMode());
+        action.setRules(setpoints);
+
+        sendAction(action, listener);
     }
 
     public void updateSetpoint(
             DbSetpoint setpoint,
             SystemStatusListener listener)
-            throws FieldNotSetException, MaxSetpointSizeException {
+            throws FieldNotSetException {
         validateFields(setpoint, false);
-        setpointRepository.updateSetpoint(setpoint);
 
-        DeviceAction action = new DeviceAction("set_setpoints");
+        List<DbSetpoint> setpoints = setpointRepository.getSetpoints()
+                .stream()
+                .map(s -> {
+                    if(s.getId().equals(setpoint.getId())) return setpoint;
+                    return s;
+                }).collect(Collectors.toList());
+
+        DeviceAction action = new DeviceAction(SET_SETPOINTS_ACTION);
         action.setRulesMode(setpointRepository.getHeaterMode());
-        action.setRules(setpointRepository.getSetpoints());
+        action.setRules(setpoints);
 
-        try {
-            mqttService.sendAction(action, listener);
-        } catch (MqttException e) {
-            System.out.println("Failed sending action to device");
-        }
+        sendAction(action, listener);
     }
 
     public void deleteSetpoint(
-            int index,
+            Integer id,
             SystemStatusListener listener) {
-        setpointRepository.removeSetpoint(index);
+        List<DbSetpoint> setpoints = setpointRepository.getSetpoints()
+                .stream()
+                .filter(s -> !s.getId().equals(id))
+                .collect(Collectors.toList());
 
-        DeviceAction action = new DeviceAction("set_setpoints");
+        DeviceAction action = new DeviceAction(SET_SETPOINTS_ACTION);
         action.setRulesMode(setpointRepository.getHeaterMode());
-        action.setRules(setpointRepository.getSetpoints());
+        action.setRules(setpoints);
 
+        sendAction(action, listener);
+    }
+
+    private void sendAction(DeviceAction action, SystemStatusListener listener){
         try {
-            mqttService.sendAction(action, listener);
+            mqttService.sendAction(action, systemStatus -> {
+                setpointRepository.setSystemStatus(systemStatus);
+                listener.systemStatusReceived(systemStatus);
+            });
         } catch (MqttException e) {
             System.out.println("Failed sending action to device");
         }
@@ -102,12 +134,6 @@ public class HeatingControlService {
                     throw new MaxSetpointSizeException("Maximum of 5 setpoints can be added to any given day", true);
                 }
             }
-
-            for(int dayOfWeek = 1; dayOfWeek < 6; dayOfWeek++){
-                DbSetpoint clonedSetpoint = new DbSetpoint(setpoint);
-                clonedSetpoint.setDay(dayOfWeek);
-                setpointRepository.addSetpoint(clonedSetpoint);
-            }
         }
 
         if(repeatWeekend){
@@ -117,18 +143,12 @@ public class HeatingControlService {
                     throw new MaxSetpointSizeException("Maximum of 5 setpoints can be added to any given day", true);
                 }
             }
-
-            for(int dayOfWeek = 6; dayOfWeek < 8; dayOfWeek++){
-                DbSetpoint clonedSetpoint = new DbSetpoint(setpoint);
-                clonedSetpoint.setDay(dayOfWeek);
-                setpointRepository.addSetpoint(clonedSetpoint);
-            }
         }
 
         if(!repeatWorkDay && !repeatWeekend){
             int setpointsInDay = setpointRepository.getSetpoints(setpoint.getDay()).size();
             if(setpointsInDay >= MAX_SIZE_PER_DAY){
-                throw new MaxSetpointSizeException("Maximum of 5 setpoints can be added to any given day", false);
+                throw new MaxSetpointSizeException("Maximum of " + MAX_SIZE_PER_DAY + " setpoints can be added to any given day", false);
             }
         }
     }
