@@ -25,10 +25,6 @@ public class DeviceAction {
         this.rulesMode = rulesMode;
     }
 
-    public List<DbSetpoint> getRules() {
-        return rules;
-    }
-
     public void setRules(List<DbSetpoint> rules) {
         this.rules = rules;
         this.rulesSize = rules.size();

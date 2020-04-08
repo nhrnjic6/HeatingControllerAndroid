@@ -115,12 +115,14 @@
                         android:padding="15dp">
 
                         <TextView
+                            android:id="@+id/active_setpoint_label"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Upcoming setpoint"
                             android:textSize="16dp"/>
 
                         <TextView
+                            android:id="@+id/active_setpoint"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Monday 10:00 with max temperature at 50&#8451;"

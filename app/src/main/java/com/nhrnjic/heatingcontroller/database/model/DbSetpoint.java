@@ -6,13 +6,14 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class DbSetpoint implements Comparable<DbSetpoint>, Serializable {
     private Integer id;
     private Integer day;
     private Integer hour;
     private Integer minute;
-    private Double temperature;
+    private BigDecimal temperature;
 
     public DbSetpoint() {
     }
@@ -23,6 +24,10 @@ public class DbSetpoint implements Comparable<DbSetpoint>, Serializable {
         this.hour = setpoint.hour;
         this.minute = setpoint.minute;
         this.temperature = setpoint.temperature;
+    }
+
+    public long getWeekInstant(){
+        return ((day - 1) * 24 * 60) + (hour * 60) + getMinute();
     }
 
     public Integer getId() {
@@ -57,11 +62,11 @@ public class DbSetpoint implements Comparable<DbSetpoint>, Serializable {
         this.minute = minute;
     }
 
-    public Double getTemperature() {
+    public BigDecimal getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(Double temperature) {
+    public void setTemperature(BigDecimal temperature) {
         this.temperature = temperature;
     }
 
@@ -79,7 +84,8 @@ public class DbSetpoint implements Comparable<DbSetpoint>, Serializable {
     }
 
     public String getTemperatureText(){
-        return temperature + "\u2103";
+        temperature = temperature.setScale(2 ,BigDecimal.ROUND_HALF_UP);
+        return temperature.toString() + "\u2103";
     }
 
     public String dayToString(){

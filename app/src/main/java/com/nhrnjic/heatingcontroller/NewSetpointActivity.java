@@ -22,6 +22,8 @@ import com.nhrnjic.heatingcontroller.service.HeatingControlService;
 
 import org.joda.time.DateTime;
 
+import java.math.BigDecimal;
+
 public class NewSetpointActivity extends AppCompatActivity {
     private DbSetpoint mSetpoint;
 
@@ -99,7 +101,7 @@ public class NewSetpointActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mTempProgress.setText("Set temperature: " + progress + " \u2103");
-                mSetpoint.setTemperature((double) progress);
+                mSetpoint.setTemperature(new BigDecimal(progress));
             }
 
             @Override
