@@ -16,6 +16,7 @@ public class SystemStatus {
     private Long updatedAt;
     private Integer rulesMode;
     private List<DbSetpoint> rules;
+    private List<Integer> tempList;
 
     public SystemStatus() {
     }

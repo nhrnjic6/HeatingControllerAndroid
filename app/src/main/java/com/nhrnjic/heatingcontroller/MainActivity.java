@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,16 +16,32 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.DefaultAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.MPPointF;
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
 import com.nhrnjic.heatingcontroller.model.SystemStatus;
 import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
 import com.nhrnjic.heatingcontroller.service.HeatingControlService;
 import com.nhrnjic.heatingcontroller.service.MqttService;
 
-import org.eazegraph.lib.charts.ValueLineChart;
-import org.eazegraph.lib.models.ValueLinePoint;
-import org.eazegraph.lib.models.ValueLineSeries;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.joda.time.DateTime;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private HeatingControlService heatingControlService = new HeatingControlService();
@@ -102,26 +119,53 @@ public class MainActivity extends AppCompatActivity {
                     systemStatus -> updateSystemStatus());
         });
 
-        ValueLineChart mCubicValueLineChart = findViewById(R.id.cubiclinechart);
+        LineChart chart = findViewById(R.id.line_chart);
+        // enable touch gestures
+        chart.setTouchEnabled(true);
+        chart.setScaleYEnabled(false);
 
-        ValueLineSeries series = new ValueLineSeries();
-        series.setColor(0xFF56B7F1);
+        MPPointF center = chart.getViewPortHandler().getContentCenter();
+        chart.zoom(3f, 0f, center.x,center.y);
 
-        series.addPoint(new ValueLinePoint("Jan", 2.4f));
-        series.addPoint(new ValueLinePoint("Feb", 3.4f));
-        series.addPoint(new ValueLinePoint("Mar", .4f));
-        series.addPoint(new ValueLinePoint("Apr", 1.2f));
-        series.addPoint(new ValueLinePoint("Mai", 2.6f));
-        series.addPoint(new ValueLinePoint("Jun", 1.0f));
-        series.addPoint(new ValueLinePoint("Jul", 3.5f));
-        series.addPoint(new ValueLinePoint("Aug", 2.4f));
-        series.addPoint(new ValueLinePoint("Sep", 2.4f));
-        series.addPoint(new ValueLinePoint("Oct", 3.4f));
-        series.addPoint(new ValueLinePoint("Nov", .4f));
-        series.addPoint(new ValueLinePoint("Dec", 1.3f));
+        // enable scaling and dragging
+        chart.setDragEnabled(true);
+        chart.setScaleEnabled(false);
 
-        mCubicValueLineChart.addSeries(series);
-        mCubicValueLineChart.startAnimation();
+        // if disabled, scaling can be done on x- and y-axis separately
+        chart.setPinchZoom(false);
+
+        chart.getDescription().setEnabled(false);
+        chart.getLegend().setEnabled(false);
+
+        List<Integer> temperature = new ArrayList<>();
+        for(int i = 0; i < 24; i++){
+            temperature.add(i);
+        }
+
+        List<Integer> swapedTemperature = new ArrayList<>();
+        int offset = getSwapedTemperature(temperature, swapedTemperature, DateTime.now());
+
+        List<Entry> entries = new ArrayList<>();
+        for(int i = 0; i < swapedTemperature.size(); i++){
+            entries.add(new Entry(i, swapedTemperature.get(i)));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Numbers");
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                return getActualIndex((int) value, offset, swapedTemperature.size()) + "";
+            }
+        });
+
+        chart.getAxisRight().setEnabled(false);
+
+        LineData data = new LineData(dataSet);
+
+        chart.setData(data);
+        chart.invalidate();
     }
 
     @Override
@@ -221,5 +265,31 @@ public class MainActivity extends AppCompatActivity {
         DbSetpoint activeSetpoint = setpointRepository.getSetpointById(systemStatus.getId());
         mActiveSetpointLabel.setText("Active setpoint");
         mActiveSetpoint.setText(activeSetpoint.dayToString() + " " + activeSetpoint.getTimeText() + " with max temperature at " + activeSetpoint.getTemperatureText());
+    }
+
+    private int getSwapedTemperature(
+            List<Integer> temperature,
+            List<Integer> swaped,
+            DateTime now){
+        int hourNow = now.getHourOfDay();
+        int offset = (temperature.size() - 1) - hourNow;
+
+        List<Integer> today = temperature.subList(0, hourNow + 1);
+        List<Integer> yesterday = temperature.subList(hourNow + 1, temperature.size());
+
+        swaped.addAll(yesterday);
+        swaped.addAll(today);
+
+        return offset;
+    }
+
+    private int getActualIndex(int newIndex, int offset, int size){
+        int actualIndex = newIndex - offset;
+
+        if(actualIndex < 0){
+            actualIndex += size;
+        }
+
+        return actualIndex;
     }
 }

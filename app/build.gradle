@@ -44,7 +44,7 @@ dependencies {
     implementation group: 'org.eclipse.paho', name: 'org.eclipse.paho.android.service', version: '1.1.1'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'joda-time:joda-time:2.10.5'
-    implementation 'com.github.blackfizz:eazegraph:1.2.2@aar'
     implementation 'com.nineoldandroids:library:2.4.0'
     compile 'com.pnikosis:materialish-progress:1.7'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }

@@ -156,7 +156,6 @@ public class SetpointListActivity extends AppCompatActivity {
                 });
                 break;
         }
-
         return true;
     }
 }
