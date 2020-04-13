@@ -40,10 +40,10 @@ public class LoadingActivity extends AppCompatActivity {
                             repository.setTemperature(status.getTemperature());
                             repository.setSetpoints(status.getRules());
                             repository.setUpdatedAt(status.getUpdatedAt());
+                            repository.setTempList(status.getTempList());
 
                             Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
                             startActivity(intent);
-                            //finish();
                         });
                     } catch (MqttException e) {
                         e.printStackTrace();

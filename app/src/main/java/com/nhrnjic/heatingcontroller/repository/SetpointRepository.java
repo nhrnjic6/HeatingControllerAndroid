@@ -16,6 +16,7 @@ public final class SetpointRepository {
     private Integer currentRuleId;
     private long updatedAt;
     private List<DbSetpoint> setpoints;
+    private List<Integer> tempList;
 
     private static SetpointRepository setpointRepository = new SetpointRepository();
 
@@ -34,6 +35,7 @@ public final class SetpointRepository {
         systemStatus.setTemperature(temperature);
         systemStatus.setId(currentRuleId);
         systemStatus.setUpdatedAt(updatedAt);
+        systemStatus.setTempList(tempList);
 
         return systemStatus;
     }
@@ -124,5 +126,9 @@ public final class SetpointRepository {
 
     public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public void setTempList(List<Integer> tempList) {
+        this.tempList = tempList;
     }
 }

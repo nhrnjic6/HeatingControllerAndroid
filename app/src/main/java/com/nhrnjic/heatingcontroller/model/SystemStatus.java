@@ -16,6 +16,7 @@ public class SystemStatus {
     private Long updatedAt;
     private Integer rulesMode;
     private List<DbSetpoint> rules;
+    private List<Integer> tempList;
 
     public SystemStatus() {
     }
@@ -76,5 +77,13 @@ public class SystemStatus {
 
     public void setRequestId(UUID requestId) {
         this.requestId = requestId;
+    }
+
+    public List<Integer> getTempList() {
+        return tempList;
+    }
+
+    public void setTempList(List<Integer> tempList) {
+        this.tempList = tempList;
     }
 }
