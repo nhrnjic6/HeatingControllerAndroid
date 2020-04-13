@@ -78,4 +78,12 @@ public class SystemStatus {
     public void setRequestId(UUID requestId) {
         this.requestId = requestId;
     }
+
+    public List<Integer> getTempList() {
+        return tempList;
+    }
+
+    public void setTempList(List<Integer> tempList) {
+        this.tempList = tempList;
+    }
 }

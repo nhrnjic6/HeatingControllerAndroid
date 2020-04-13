@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     private HeatingControlService heatingControlService = new HeatingControlService();
@@ -137,13 +138,9 @@ public class MainActivity extends AppCompatActivity {
         chart.getDescription().setEnabled(false);
         chart.getLegend().setEnabled(false);
 
-        List<Integer> temperature = new ArrayList<>();
-        for(int i = 0; i < 24; i++){
-            temperature.add(i);
-        }
-
         List<Integer> swapedTemperature = new ArrayList<>();
-        int offset = getSwapedTemperature(temperature, swapedTemperature, DateTime.now());
+        List<Integer> avgTemperature = getAvgTemperature(setpointRepository.getSystemStatus().getTempList());
+        int offset = getSwapedTemperature(avgTemperature, swapedTemperature, DateTime.now());
 
         List<Entry> entries = new ArrayList<>();
         for(int i = 0; i < swapedTemperature.size(); i++){
@@ -291,5 +288,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return actualIndex;
+    }
+
+    public List<Integer> getAvgTemperature(List<Integer> temperature){
+        int sum = 0;
+
+        List<Integer> avgTemperature = new ArrayList<>();
+
+        for(int i = 0; i < temperature.size(); i++){
+            sum += temperature.get(i);
+
+            if((i + 1) % 4 == 0){
+                avgTemperature.add(sum / 4);
+                sum = 0;
+            }
+        }
+
+        return avgTemperature;
     }
 }
