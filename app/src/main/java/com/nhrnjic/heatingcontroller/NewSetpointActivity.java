@@ -130,7 +130,7 @@ public class NewSetpointActivity extends AppCompatActivity {
                                     startActivity(intent);
                                     finish();
                                 });
-                            });
+                            }, () -> failedConnectionActivity());
                 }else{
                     heatingControlService.updateSetpoint(
                             mSetpoint, systemStatus -> {
@@ -139,7 +139,7 @@ public class NewSetpointActivity extends AppCompatActivity {
                                     startActivity(intent);
                                     finish();
                                 });
-                            });
+                            }, () -> failedConnectionActivity());
                 }
             } catch (FieldNotSetException e) {
                 mProgressWheelParent.setVisibility(View.GONE);
@@ -178,5 +178,11 @@ public class NewSetpointActivity extends AppCompatActivity {
         }else{
             mSetpoint = new DbSetpoint();
         }
+    }
+
+    private void failedConnectionActivity(){
+        Intent intent = new Intent(NewSetpointActivity.this, ReloadActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

@@ -4,6 +4,7 @@ import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
 import com.nhrnjic.heatingcontroller.exception.FieldNotSetException;
 import com.nhrnjic.heatingcontroller.exception.MaxSetpointSizeException;
 import com.nhrnjic.heatingcontroller.model.DeviceAction;
+import com.nhrnjic.heatingcontroller.model.ErrorListener;
 import com.nhrnjic.heatingcontroller.model.SystemStatusListener;
 import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
 
@@ -27,19 +28,21 @@ public class HeatingControlService {
 
     public void changeRulesMode(
             int rulesMode,
-            SystemStatusListener listener){
+            SystemStatusListener listener,
+            ErrorListener errorListener){
         DeviceAction action = new DeviceAction(SET_SETPOINTS_ACTION);
         action.setRulesMode(rulesMode);
         action.setRules(setpointRepository.getSetpoints());
 
-        sendAction(action, listener);
+        sendAction(action, listener, errorListener);
     }
 
     public void saveNewSetpoint(
             DbSetpoint setpoint,
             boolean repeatWorkDay,
             boolean repeatWeekend,
-            SystemStatusListener listener)
+            SystemStatusListener listener,
+            ErrorListener errorListener)
             throws FieldNotSetException, MaxSetpointSizeException {
         validateSetpoint(setpoint, repeatWorkDay, repeatWeekend);
 
@@ -72,12 +75,12 @@ public class HeatingControlService {
         action.setRulesMode(setpointRepository.getHeaterMode());
         action.setRules(setpoints);
 
-        sendAction(action, listener);
+        sendAction(action, listener, errorListener);
     }
 
     public void updateSetpoint(
             DbSetpoint setpoint,
-            SystemStatusListener listener)
+            SystemStatusListener listener, ErrorListener errorListener)
             throws FieldNotSetException {
         validateFields(setpoint, false);
 
@@ -92,12 +95,12 @@ public class HeatingControlService {
         action.setRulesMode(setpointRepository.getHeaterMode());
         action.setRules(setpoints);
 
-        sendAction(action, listener);
+        sendAction(action, listener, errorListener);
     }
 
     public void deleteSetpoint(
             Integer id,
-            SystemStatusListener listener) {
+            SystemStatusListener listener, ErrorListener errorListener) {
         List<DbSetpoint> setpoints = setpointRepository.getSetpoints()
                 .stream()
                 .filter(s -> !s.getId().equals(id))
@@ -107,15 +110,15 @@ public class HeatingControlService {
         action.setRulesMode(setpointRepository.getHeaterMode());
         action.setRules(setpoints);
 
-        sendAction(action, listener);
+        sendAction(action, listener, errorListener);
     }
 
-    private void sendAction(DeviceAction action, SystemStatusListener listener){
+    private void sendAction(DeviceAction action, SystemStatusListener listener, ErrorListener errorListener){
         try {
             mqttService.sendAction(action, systemStatus -> {
                 setpointRepository.setSystemStatus(systemStatus);
                 listener.systemStatusReceived(systemStatus);
-            });
+            }, errorListener);
         } catch (MqttException e) {
             System.out.println("Failed sending action to device");
         }

@@ -103,21 +103,24 @@ public class MainActivity extends AppCompatActivity {
             mProgressWheelParent.setVisibility(View.VISIBLE);
             heatingControlService.changeRulesMode(
                     0,
-                    systemStatus -> updateSystemStatus());
+                    systemStatus -> updateSystemStatus(),
+                    this::failedConnectionActivity);
         });
 
         onModeButton.setOnClickListener(v -> {
             mProgressWheelParent.setVisibility(View.VISIBLE);
             heatingControlService.changeRulesMode(
                     1,
-                    systemStatus -> updateSystemStatus());
+                    systemStatus -> updateSystemStatus(),
+                    this::failedConnectionActivity);
         });
 
         defaultModeButton.setOnClickListener(v -> {
             mProgressWheelParent.setVisibility(View.VISIBLE);
             heatingControlService.changeRulesMode(
                     2,
-                    systemStatus -> updateSystemStatus());
+                    systemStatus -> updateSystemStatus(),
+                    this::failedConnectionActivity);
         });
 
         LineChart chart = findViewById(R.id.line_chart);
@@ -305,5 +308,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return avgTemperature;
+    }
+
+    private void failedConnectionActivity(){
+        Intent intent = new Intent(MainActivity.this, ReloadActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

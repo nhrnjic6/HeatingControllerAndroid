@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.nhrnjic.heatingcontroller.exception.ActionNotCompleteException;
 import com.nhrnjic.heatingcontroller.repository.SetpointRepository;
 import com.nhrnjic.heatingcontroller.service.MqttService;
 import com.pnikosis.materialishprogress.ProgressWheel;
@@ -44,20 +45,30 @@ public class LoadingActivity extends AppCompatActivity {
 
                             Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
                             startActivity(intent);
-                        });
+                        }, () -> failedConnectionActivity());
                     } catch (MqttException e) {
-                        e.printStackTrace();
+                        failedConnectionActivity();
                     }
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    System.out.println("Failed connecting to MQTT");
+                    failedConnectionActivity();
                 }
             });
 
         } catch (MqttException e) {
-            e.printStackTrace();
+            failedConnectionActivity();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+    }
+
+    private void failedConnectionActivity(){
+        Intent intent = new Intent(LoadingActivity.this, ReloadActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
