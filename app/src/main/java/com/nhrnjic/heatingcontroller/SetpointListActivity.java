@@ -153,9 +153,15 @@ public class SetpointListActivity extends AppCompatActivity {
                         mNewMenuItem.setVisible(true);
                         mProgressWheelParent.setVisibility(View.GONE);
                     });
-                });
+                }, this::failedConnectionActivity);
                 break;
         }
         return true;
+    }
+
+    private void failedConnectionActivity(){
+        Intent intent = new Intent(SetpointListActivity.this, ReloadActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
