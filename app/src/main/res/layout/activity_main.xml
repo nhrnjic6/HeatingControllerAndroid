@@ -19,6 +19,7 @@
             android:background="?attr/colorPrimary"
             android:theme="@style/ToolbarTheme"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="Overview"
             />
 
         <ScrollView android:layout_height="wrap_content"
@@ -63,7 +64,7 @@
                             android:id="@+id/temperature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawableLeft="@mipmap/ic_temperature"
+                            android:drawableLeft="@mipmap/ic_temp"
                             android:layout_marginTop="10dp"
                             android:paddingLeft="-15dp"
                             android:text="50&#8451;"

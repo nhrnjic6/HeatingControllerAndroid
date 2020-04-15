@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#fff">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_list"
@@ -19,6 +20,7 @@
             android:background="?attr/colorPrimary"
             android:theme="@style/ToolbarTheme"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="Setpoints"
             />
 
         <Button
