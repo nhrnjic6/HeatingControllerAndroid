@@ -6,7 +6,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,15 +18,10 @@ import android.widget.TextView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.DefaultAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.nhrnjic.heatingcontroller.database.model.DbSetpoint;
 import com.nhrnjic.heatingcontroller.model.SystemStatus;
@@ -39,10 +33,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     private HeatingControlService heatingControlService = new HeatingControlService();
@@ -142,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         chart.getLegend().setEnabled(false);
 
         List<Integer> swapedTemperature = new ArrayList<>();
-        List<Integer> avgTemperature = getAvgTemperature(setpointRepository.getSystemStatus().getTempList());
+        List<Integer> avgTemperature = getBiggestTemperature(setpointRepository.getSystemStatus().getTempList());
         int offset = getSwapedTemperature(avgTemperature, swapedTemperature, DateTime.now());
 
         List<Entry> entries = new ArrayList<>();
@@ -293,21 +284,23 @@ public class MainActivity extends AppCompatActivity {
         return actualIndex;
     }
 
-    public List<Integer> getAvgTemperature(List<Integer> temperature){
-        int sum = 0;
+    public List<Integer> getBiggestTemperature(List<Integer> temperature){
+        int biggest = 0;
 
-        List<Integer> avgTemperature = new ArrayList<>();
+        List<Integer> biggestTemperature = new ArrayList<>();
 
         for(int i = 0; i < temperature.size(); i++){
-            sum += temperature.get(i);
+            if(temperature.get(i) > biggest){
+                biggest = temperature.get(i);
+            }
 
             if((i + 1) % 4 == 0){
-                avgTemperature.add(sum / 4);
-                sum = 0;
+                biggestTemperature.add(biggest);
+                biggest = 0;
             }
         }
 
-        return avgTemperature;
+        return biggestTemperature;
     }
 
     private void failedConnectionActivity(){
