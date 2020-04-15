@@ -9,19 +9,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="10:00"
-        android:drawableLeft="@mipmap/ic_time"
+        android:drawableLeft="@mipmap/ic_clock"
         android:gravity="center_vertical"
-        android:drawablePadding="5dp"
         android:textSize="25dp"/>
 
     <TextView
         android:id="@+id/setpoint_item_temperature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableLeft="@mipmap/ic_temperature"
+        android:drawableLeft="@mipmap/ic_temp"
         android:text="50&#8451;"
         android:textSize="25dp"
-        android:drawablePadding="5dp"
         android:gravity="center_vertical"
         android:layout_alignParentRight="true"/>
 

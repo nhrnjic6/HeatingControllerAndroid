@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
 
         runOnUiThread(() -> {
             mTempText.setText(status.getTemperatureRounded() + "\u2103");
-            mStatusUpdateAt.setText("Updated at:" + status.formattedUpdatedAt());
+            mStatusUpdateAt.setText("Updated at: " + status.formattedUpdatedAt());
             setActiveButton(status.getRulesMode());
             updateActiveSetpointUI(status);
             mProgressWheelParent.setVisibility(View.GONE);
