@@ -15,6 +15,7 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MqttService {
-    public static final String MQTT_BROKER_URL = "tcp://192.168.1.3:1883";
+    public static final String MQTT_BROKER_URL = "tcp://167.172.171.209:1883";
     public static final String STATUS_TOPIC = "sensors/heatingControl/status";
     public static final String ACTION_TOPIC = "sensors/heatingControl/action";
 
@@ -47,7 +48,10 @@ public class MqttService {
     }
 
     public void initConnection(IMqttActionListener actionListener) throws MqttException {
-        client.connect().setActionCallback(actionListener);
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setUserName("nhrnjic");
+        options.setPassword("RBKz2rmmnFh77ACR62pR".toCharArray());
+        client.connect(options).setActionCallback(actionListener);
     }
 
     public void getSystemStatus(SystemStatusListener listener) throws MqttException {

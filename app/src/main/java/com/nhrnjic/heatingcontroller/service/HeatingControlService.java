@@ -46,12 +46,12 @@ public class HeatingControlService {
             throws FieldNotSetException, MaxSetpointSizeException {
         validateSetpoint(setpoint, repeatWorkDay, repeatWeekend);
 
-        List<DbSetpoint> setpoints = setpointRepository.getSetpoints();
+        final List<DbSetpoint> setpoints = setpointRepository.getSetpoints();
 
         if(repeatWorkDay){
             IntStream.rangeClosed(1,5).forEach(day -> {
                 DbSetpoint newSetpoint = new DbSetpoint(setpoint);
-                newSetpoint.setId(setpointRepository.nextId());
+                newSetpoint.setId(setpointRepository.nextId(setpoints));
                 newSetpoint.setDay(day);
                 setpoints.add(newSetpoint);
             });
@@ -60,21 +60,26 @@ public class HeatingControlService {
         if(repeatWeekend){
             IntStream.rangeClosed(6,7).forEach(day -> {
                 DbSetpoint newSetpoint = new DbSetpoint(setpoint);
-                newSetpoint.setId(setpointRepository.nextId());
+                newSetpoint.setId(setpointRepository.nextId(setpoints));
                 newSetpoint.setDay(day);
                 setpoints.add(newSetpoint);
             });
         }
 
         if(!repeatWorkDay && !repeatWeekend){
-            setpoint.setId(setpointRepository.nextId());
+            setpoint.setId(setpointRepository.nextId(setpoints));
             setpoints.add(setpoint);
         }
 
         DeviceAction action = new DeviceAction(SET_SETPOINTS_ACTION);
         action.setRulesMode(setpointRepository.getHeaterMode());
-        action.setRules(setpoints);
 
+        List<DbSetpoint> sortedSetpoints = setpoints
+                .stream()
+                .sorted()
+                .collect(Collectors.toList());
+
+        action.setRules(sortedSetpoints);
         sendAction(action, listener, errorListener);
     }
 
