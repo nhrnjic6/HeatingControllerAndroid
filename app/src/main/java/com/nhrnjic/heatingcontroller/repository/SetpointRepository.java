@@ -63,6 +63,15 @@ public final class SetpointRepository {
         return sortedByIdDesc.get(0).getId() + 1;
     }
 
+    public Integer nextId(List<DbSetpoint> targetSetpoints){
+        List<DbSetpoint> sortedByIdDesc = targetSetpoints.stream()
+                .sorted((e1, e2) -> e2.getId() - e1.getId())
+                .collect(Collectors.toList());
+
+        if(sortedByIdDesc.isEmpty()) return 1;
+        return sortedByIdDesc.get(0).getId() + 1;
+    }
+
     public void setSetpoints(List<DbSetpoint> setpoints) {
         this.setpoints = setpoints;
     }
